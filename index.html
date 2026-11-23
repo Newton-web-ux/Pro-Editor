@@ -2295,5 +2295,231 @@ updateOptionsBar();
 $('#btn-home').innerHTML = svgIcon('home');
 switchView('dashboard');
 </script>
+<!-- ===== PRO EDITOR UPGRADE — paste this whole block just before </body> ===== -->
+<style>
+#stage-wrap{display:grid;padding:28px}
+#canvas-holder,#empty-state{margin:auto}
+@media (any-pointer:fine){.tool-btn{height:30px}}
+#statusbar .pe-btn{background:none;border:1px solid var(--border);color:var(--text-dim);border-radius:3px;font:inherit;padding:1px 8px;cursor:pointer}
+#statusbar .pe-btn:hover{color:var(--accent-strong);border-color:var(--accent)}
+#sig-overlay{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;z-index:1000}
+#sig-overlay.show{display:flex}
+#sig-box{background:#232326;border:1px solid var(--border);border-radius:8px;padding:18px;width:520px;max-width:94vw}
+#sig-canvas{background:#fff;border-radius:4px;width:100%;touch-action:none;cursor:crosshair;display:block}
+</style>
+<input type="file" id="pe-insert" accept=".pdf,.png,.jpg,.jpeg" style="display:none">
+<div id="sig-overlay"><div id="sig-box">
+  <h3 style="margin:0 0 12px;font-size:14px">Draw your signature</h3>
+  <canvas id="sig-canvas" width="900" height="300"></canvas>
+  <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+    <button class="btn-sm" id="sig-clear" style="flex:none">Clear</button>
+    <button class="btn-sm" id="sig-cancel" style="flex:none">Cancel</button>
+    <button class="btn-sm toggle-active" id="sig-use" style="flex:none">Use signature</button>
+  </div>
+</div></div>
+<script>
+(()=>{
+const stage=$('#stage-wrap'), STAMPS=['APPROVED','DRAFT','CONFIDENTIAL','REVIEWED','REJECTED','FINAL'];
+Object.assign(state,{fill:false,opacity:1,stamp:'APPROVED',sig:null});
+const clone=o=>({...o,points:o.points&&o.points.map(p=>({...p}))});
+let tmr; const later=f=>{clearTimeout(tmr);tmr=setTimeout(f,400);};
+
+/* ---------- new tools ---------- */
+Object.assign(ICONS,{
+ hand:'<path d="M8 13V5a1.5 1.5 0 013 0v6m0-5a1.5 1.5 0 013 0v5m0-3a1.5 1.5 0 013 0v7a6 6 0 01-6 6h-1a6 6 0 01-5-3l-3-5a1.5 1.5 0 012.5-1.5L8 15"/>',
+ whiteout:'<rect x="3" y="6" width="18" height="12" rx="1" fill="currentColor" fill-opacity=".2"/>',
+ redact:'<rect x="3" y="6" width="18" height="12" rx="1" fill="currentColor"/>',
+ stamp:'<path d="M5 21h14M8 17h8l-1-5a3 3 0 10-6 0z"/>',
+ sign:'<path d="M3 16c3-6 5-9 6-8s-3 8-1 8 4-6 6-6 0 5 2 5 3-2 5-3"/><path d="M3 21h18"/>'});
+TOOLS.splice(1,0,{id:'hand',icon:'hand',label:'Hand / pan (M)'});
+TOOLS.splice(TOOLS.findIndex(t=>t.id==='note'),0,
+ {id:'whiteout',icon:'whiteout',label:'Whiteout (W)'},{id:'redact',icon:'redact',label:'Redact (X)'},
+ {id:'stamp',icon:'stamp',label:'Stamp (S)'},{id:'sign',icon:'sign',label:'Signature (G)'});
+Object.assign(TOOL_META,{hand:{label:'Hand',key:'M'},whiteout:{label:'Whiteout',key:'W'},redact:{label:'Redact',key:'X'},stamp:{label:'Stamp',key:'S'},sign:{label:'Sign',key:'G'}});
+buildToolRail();
+
+/* ---------- rendering of new object types ---------- */
+const _draw=drawObject;
+drawObject=function(ctx,o,sel){
+ const T=o.type;
+ if(T==='whiteout'||T==='redact'||((T==='rect'||T==='ellipse')&&o.fill)){
+  ctx.save();ctx.globalAlpha=(T==='rect'||T==='ellipse')?(o.opacity??1):1;
+  ctx.fillStyle=T==='whiteout'?'#fff':T==='redact'?'#000':o.color;
+  ctx.beginPath();
+  if(T==='ellipse')ctx.ellipse(o.x+o.w/2,o.y+o.h/2,Math.abs(o.w/2),Math.abs(o.h/2),0,0,7);else ctx.rect(o.x,o.y,o.w,o.h);
+  ctx.fill();ctx.restore();if(sel)drawSelectionBox(ctx,o);
+ } else if(T==='stamp'){
+  ctx.save();ctx.globalAlpha=o.opacity??.9;ctx.strokeStyle=ctx.fillStyle=o.color;ctx.lineWidth=Math.max(2,o.h*.08);
+  ctx.strokeRect(o.x,o.y,o.w,o.h);ctx.font=`800 ${o.h*.5}px Syne,sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(o.text,o.x+o.w/2,o.y+o.h/2,o.w*.9);ctx.restore();if(sel)drawSelectionBox(ctx,o);
+ } else if((T==='rect'||T==='ellipse'||T==='image')&&o.opacity!=null){
+  ctx.save();ctx.globalAlpha=o.opacity;_draw(ctx,o,sel);ctx.restore();
+ } else _draw(ctx,o,sel);
+};
+
+/* ---------- zoom: real layout zoom, fit width/page, Ctrl+wheel ---------- */
+applyZoomStyle=function(){
+ const pg=state.pages[state.currentPage];if(!pg)return;
+ const w=pg.width*state.zoom+'px',h=pg.height*state.zoom+'px';
+ canvasHolder.style.transform='none';canvasHolder.style.width=w;canvasHolder.style.height=h;
+ [baseCanvas,overlayCanvas].forEach(c=>{c.style.width=w;c.style.height=h;});
+};
+function fit(m){const pg=state.pages[state.currentPage];if(!pg)return;
+ const W=stage.clientWidth-60,H=stage.clientHeight-60;
+ state.zoom=Math.max(.1,Math.min(3,m==='w'?W/pg.width:Math.min(W/pg.width,H/pg.height)));applyZoomStyle();updateStatus();}
+const zc=$('.zoom-controls');
+zc.insertAdjacentHTML('beforebegin','<button class="pe-btn" id="pe-fw">Fit width</button><button class="pe-btn" id="pe-fp">Fit page</button>');
+$('#pe-fw').onclick=()=>fit('w');$('#pe-fp').onclick=()=>fit('p');
+stage.addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();
+ state.zoom=Math.min(4,Math.max(.1,state.zoom*(e.deltaY<0?1.1:.9)));applyZoomStyle();updateStatus();},{passive:false});
+for(const n of ['loadFile','openProject','startBlankDocument']){
+ const f=window[n];window[n]=async function(...a){const r=await f.apply(this,a);if(state.pages.length)requestAnimationFrame(()=>fit('p'));return r;};}
+
+/* ---------- pointer handling (capture phase, takes over new tools) ---------- */
+let ext=null,pendingPt=null;
+const BOX=['rect','ellipse','whiteout','redact'];
+function handleAt(pt){const o=getSelectedObject();if(!o||o.type==='note')return null;
+ const b=getBBox(o),r=10/state.zoom,c=[[b.x-4,b.y-4],[b.x+b.w+4,b.y-4],[b.x-4,b.y+b.h+4],[b.x+b.w+4,b.y+b.h+4]];
+ const i=c.findIndex(q=>Math.abs(q[0]-pt.x)<r&&Math.abs(q[1]-pt.y)<r);
+ return i<0?null:{o,b,i,g:clone(o)};}
+function place(o){const pg=state.pages[state.currentPage];o.id=newId();pg.objects.push(o);state.selectedObjectId=o.id;
+ commitHistory();setTool('select');buildNotesTab();}
+function placeSig(pt){const s=state.sig,w=220;place({type:'image',x:pt.x-w/2,y:pt.y-w*s.r/2,w,h:w*s.r,img:s.img,color:'#000'});}
+overlayCanvas.addEventListener('pointerdown',e=>{
+ if(!state.pages.length||ext)return;
+ const t=state.tool,pt=canvasPoint(e);let h;
+ if(t==='hand')ext={m:'pan',x:e.clientX,y:e.clientY,l:stage.scrollLeft,t:stage.scrollTop};
+ else if(t==='select'&&(h=handleAt(pt)))ext={m:'size',...h};
+ else if(BOX.includes(t))ext={m:'box',t,s:pt};
+ else if(t==='stamp'){e.stopImmediatePropagation();const H=56;
+  place({type:'stamp',text:state.stamp,x:pt.x-80,y:pt.y-H/2,w:Math.max(150,state.stamp.length*32),h:H,color:state.color});return;}
+ else if(t==='sign'){e.stopImmediatePropagation();state.sig?placeSig(pt):openSig(pt);return;}
+ else return;
+ e.stopImmediatePropagation();e.preventDefault();overlayCanvas.setPointerCapture(e.pointerId);
+},true);
+window.addEventListener('pointermove',e=>{
+ if(!ext)return;const pt=canvasPoint(e);
+ if(ext.m==='pan'){stage.scrollLeft=ext.l-(e.clientX-ext.x);stage.scrollTop=ext.t-(e.clientY-ext.y);}
+ else if(ext.m==='box'){const s=ext.s;
+  dragState={mode:'ext',previewObj:{type:ext.t,x:Math.min(s.x,pt.x),y:Math.min(s.y,pt.y),w:Math.abs(pt.x-s.x),h:Math.abs(pt.y-s.y),
+   color:state.color,strokeWidth:state.strokeWidth,fill:state.fill,opacity:state.opacity}};redrawOverlay();}
+ else if(ext.m==='size'){const {b,i,g,o}=ext;
+  const ax=i%2?b.x:b.x+b.w,ay=i<2?b.y+b.h:b.y;
+  const nb={x:Math.min(ax,pt.x),y:Math.min(ay,pt.y),w:Math.max(Math.abs(pt.x-ax),6),h:Math.max(Math.abs(pt.y-ay),6)};
+  const sx=b.w?nb.w/b.w:1,sy=b.h?nb.h/b.h:1,X=v=>nb.x+(v-b.x)*sx,Y=v=>nb.y+(v-b.y)*sy;
+  if(g.points)o.points=g.points.map(p=>({...p,x:X(p.x),y:Y(p.y)}));
+  else{o.x=X(g.x);o.y=Y(g.y);if(g.x2!==undefined){o.x2=X(g.x2);o.y2=Y(g.y2);}
+   if(g.w!==undefined){o.w=g.w*sx;o.h=g.h*sy;}if(g.type==='text')o.fontSize=Math.max(8,g.fontSize*sy);}
+  redrawOverlay();}
+});
+window.addEventListener('pointerup',()=>{
+ if(!ext)return;const x=ext;ext=null;const pv=dragState&&dragState.previewObj;dragState=null;
+ if(x.m==='box'&&pv&&pv.w>2&&pv.h>2){pv.id=newId();state.pages[state.currentPage].objects.push(pv);
+  if(x.t==='rect'||x.t==='ellipse')state.selectedObjectId=null;commitHistory();buildNotesTab();}
+ else if(x.m==='size')commitHistory();
+ redrawOverlay();
+});
+const _st=setTool;setTool=function(id){_st(id);if(id==='hand')overlayCanvas.style.cursor='grab';};
+
+/* ---------- keyboard: shortcuts, nudge, duplicate, arrange ---------- */
+window.addEventListener('keydown',e=>{
+ if(isTypingTarget(e.target)||!state.pages.length)return;
+ const k=e.key.toLowerCase(),o=getSelectedObject(),pg=state.pages[state.currentPage],mod=e.ctrlKey||e.metaKey;
+ if(!mod){const m={m:'hand',w:'whiteout',x:'redact',s:'stamp',g:'sign'};if(m[k]){setTool(m[k]);return;}}
+ if(!o||state.tool!=='select')return;
+ if(k.startsWith('arrow')){e.preventDefault();const d=e.shiftKey?10:1,dx=k==='arrowleft'?-d:k==='arrowright'?d:0,dy=k==='arrowup'?-d:k==='arrowdown'?d:0;
+  if(o.points)o.points=o.points.map(p=>({...p,x:p.x+dx,y:p.y+dy}));else{o.x+=dx;o.y+=dy;if(o.x2!==undefined){o.x2+=dx;o.y2+=dy;}}
+  redrawOverlay();later(commitHistory);}
+ else if(mod&&k==='d'){e.preventDefault();dupSel();}
+ else if(k===']'||k==='['){const i=pg.objects.indexOf(o);pg.objects.splice(i,1);
+  k===']'?pg.objects.push(o):pg.objects.unshift(o);commitHistory();redrawOverlay();}
+});
+function dupSel(){const o=getSelectedObject();if(!o)return;const c=clone(o);c.id=newId();
+ if(c.points)c.points=c.points.map(p=>({...p,x:p.x+16,y:p.y+16}));else{c.x+=16;c.y+=16;if(c.x2!==undefined){c.x2+=16;c.y2+=16;}}
+ state.pages[state.currentPage].objects.push(c);state.selectedObjectId=c.id;commitHistory();buildLeftPanel();redrawOverlay();}
+
+/* ---------- properties panel additions ---------- */
+const opField=v=>`<div class="field"><label>Opacity</label><div class="range-row"><input type="range" id="pe-op" min="5" max="100" value="${Math.round(v*100)}"><span class="range-val">${Math.round(v*100)}%</span></div></div>`;
+const _blp=buildLeftPanel;
+buildLeftPanel=function(){
+ _blp();const t=state.tool,o=getSelectedObject();let h='';
+ const hint=s=>`<p class="hint">${s}</p>`;
+ if(t==='rect'||t==='ellipse')h+=`<div class="field"><label>Fill</label><div class="toggle-row"><button class="btn-sm ${state.fill?'toggle-active':''}" id="pe-fill">Filled shape</button></div></div>`+opField(state.opacity);
+ if(t==='stamp')h+=`<div class="field"><label>Stamp</label><select id="pe-stamp">${STAMPS.map(s=>`<option ${s===state.stamp?'selected':''}>${s}</option>`).join('')}</select></div>`+hint('Click the page to place it. Drag a corner handle to resize.');
+ if(t==='sign')h+=`<div class="field"><button class="btn-sm" id="pe-newsig">${state.sig?'Redraw signature…':'Draw signature…'}</button></div>`+hint('Click the page to place your signature.');
+ if(t==='whiteout')h+=hint('Drag to cover content with white, then add new text on top to edit it.');
+ if(t==='redact')h+=hint('Drag over sensitive content. Export flattens each page, so the covered pixels are permanently removed.');
+ if(t==='hand')h+=hint('Drag to pan. Ctrl + wheel zooms.');
+ if(t==='select'&&o){
+  if(o.type==='rect'||o.type==='ellipse')h+=`<div class="field"><button class="btn-sm ${o.fill?'toggle-active':''}" id="pe-ofill">Filled</button></div>`;
+  if(['rect','ellipse','image','stamp'].includes(o.type))h+=opField(o.opacity??(o.type==='stamp'?.9:1));
+  h+=`<div class="btn-row" style="margin-bottom:8px"><button class="btn-sm" id="pe-dup">Duplicate</button><button class="btn-sm" id="pe-front">Front</button><button class="btn-sm" id="pe-back">Back</button></div>`+hint('Drag corner handles to resize. Arrow keys nudge (Shift = 10px).');
+ }
+ if(!h)return;$('#left-panel').insertAdjacentHTML('beforeend',h);
+ const g=id=>document.getElementById(id);
+ if(g('pe-fill'))g('pe-fill').onclick=()=>{state.fill=!state.fill;buildLeftPanel();};
+ if(g('pe-ofill'))g('pe-ofill').onclick=()=>{o.fill=!o.fill;commitHistory();buildLeftPanel();redrawOverlay();};
+ if(g('pe-op'))g('pe-op').oninput=ev=>{const v=ev.target.value/100;ev.target.nextElementSibling.textContent=ev.target.value+'%';
+  if(t==='select'&&o){o.opacity=v;redrawOverlay();later(commitHistory);}else state.opacity=v;};
+ if(g('pe-stamp'))g('pe-stamp').onchange=ev=>{state.stamp=ev.target.value;};
+ if(g('pe-newsig'))g('pe-newsig').onclick=()=>openSig(null);
+ if(g('pe-dup'))g('pe-dup').onclick=dupSel;
+ const ord=f=>()=>{const pg=state.pages[state.currentPage],i=pg.objects.indexOf(o);pg.objects.splice(i,1);f(pg.objects,o);commitHistory();redrawOverlay();};
+ if(g('pe-front'))g('pe-front').onclick=ord((a,x)=>a.push(x));
+ if(g('pe-back'))g('pe-back').onclick=ord((a,x)=>a.unshift(x));
+};
+buildLeftPanel();
+
+/* ---------- signature pad ---------- */
+const sc=$('#sig-canvas'),sx=sc.getContext('2d');let ink=null,drawing=false;
+const resetSig=()=>{sx.clearRect(0,0,sc.width,sc.height);ink=null;};
+function openSig(pt){pendingPt=pt;resetSig();$('#sig-overlay').classList.add('show');}
+const sp=e=>{const r=sc.getBoundingClientRect();return{x:(e.clientX-r.left)*sc.width/r.width,y:(e.clientY-r.top)*sc.height/r.height};};
+sc.addEventListener('pointerdown',e=>{drawing=true;sc.setPointerCapture(e.pointerId);const p=sp(e);
+ sx.strokeStyle='#14246b';sx.lineWidth=6;sx.lineCap=sx.lineJoin='round';sx.beginPath();sx.moveTo(p.x,p.y);
+ ink=ink||{a:p.x,b:p.y,c:p.x,d:p.y};});
+sc.addEventListener('pointermove',e=>{if(!drawing)return;const p=sp(e);sx.lineTo(p.x,p.y);sx.stroke();
+ ink.a=Math.min(ink.a,p.x);ink.b=Math.min(ink.b,p.y);ink.c=Math.max(ink.c,p.x);ink.d=Math.max(ink.d,p.y);});
+sc.addEventListener('pointerup',()=>{drawing=false;});
+$('#sig-clear').onclick=resetSig;
+$('#sig-cancel').onclick=()=>$('#sig-overlay').classList.remove('show');
+$('#sig-use').onclick=()=>{if(!ink)return;const pad=10,w=ink.c-ink.a+pad*2,h=ink.d-ink.b+pad*2,c=document.createElement('canvas');
+ c.width=w;c.height=h;c.getContext('2d').drawImage(sc,ink.a-pad,ink.b-pad,w,h,0,0,w,h);
+ const img=new Image();img.onload=()=>{state.sig={img,r:h/w};$('#sig-overlay').classList.remove('show');
+  if(state.tool==='sign'&&pendingPt)placeSig(pendingPt);else buildLeftPanel();};img.src=c.toDataURL();};
+
+/* ---------- history fixes: keep images in undo, don't alias snapshots ---------- */
+const cl=o=>o.type==='image'?{...o}:JSON.parse(JSON.stringify(o));
+snapshotDoc=()=>state.pages.map(pg=>({objects:pg.objects.map(cl),dataUrl:pg.baseCanvas.toDataURL(),width:pg.width,height:pg.height,
+ textRuns:pg.textRuns?JSON.parse(JSON.stringify(pg.textRuns)):undefined}));
+const _rs=restoreSnapshot;restoreSnapshot=s=>_rs(s.map(p=>({...p,objects:p.objects.map(cl)})));
+
+/* ---------- document tools (Object menu) ---------- */
+const dd=document.querySelector('[data-menu="object"] .menu-dropdown');
+dd.insertAdjacentHTML('beforeend','<div class="menu-divider"></div><button class="menu-opt" id="pe-m-ins">Insert pages from file…</button><button class="menu-opt" id="pe-m-wm">Add watermark…</button><button class="menu-opt" id="pe-m-num">Add page numbers</button><button class="menu-opt" id="pe-m-png">Export this page as PNG</button>');
+const needDoc=()=>{if(!state.pages.length)return false;if(state.fileType==='pptx'){toast('Not available for PPTX');return false;}return true;};
+$('#pe-m-ins').onclick=()=>{if(needDoc())$('#pe-insert').click();};
+$('#pe-insert').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const add=[];
+ try{
+  if(/\.pdf$/i.test(f.name)){const pdf=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise;
+   for(let i=1;i<=pdf.numPages;i++){const p=await pdf.getPage(i),v=p.getViewport({scale:1.5}),c=document.createElement('canvas');
+    c.width=v.width;c.height=v.height;await p.render({canvasContext:c.getContext('2d'),viewport:v}).promise;add.push(c);}}
+  else{const img=await new Promise((r,j)=>{const m=new Image();m.onload=()=>r(m);m.onerror=j;m.src=URL.createObjectURL(f);});
+   const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);add.push(c);}
+ }catch(err){toast('Could not insert: '+err.message);return;}
+ state.pages.splice(state.currentPage+1,0,...add.map(c=>({baseCanvas:c,objects:[],width:c.width,height:c.height})));
+ state.currentPage++;commitHistory();renderCurrentPage();buildPagesTab();buildTextTab();buildNotesTab();updateStatus();toast(add.length+' page(s) inserted');};
+$('#pe-m-wm').onclick=()=>{if(!needDoc())return;const t=prompt('Watermark text','CONFIDENTIAL');if(!t)return;
+ state.pages.forEach(pg=>{const c=pg.baseCanvas.getContext('2d'),w=pg.width,h=pg.height;c.save();c.globalAlpha=.12;c.fillStyle='#777';
+  c.translate(w/2,h/2);c.rotate(-Math.atan2(h,w));c.font=`800 ${Math.min(w,h)*.13}px Syne,sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(t,0,0,Math.hypot(w,h)*.8);c.restore();});
+ commitHistory();renderCurrentPage();toast('Watermark added');};
+$('#pe-m-num').onclick=()=>{if(!needDoc())return;
+ state.pages.forEach((pg,i)=>{const c=pg.baseCanvas.getContext('2d');c.save();c.fillStyle='#555';c.font=`${Math.max(12,pg.width*.016)}px 'DM Sans',sans-serif`;
+  c.textAlign='center';c.fillText(`${i+1} / ${state.pages.length}`,pg.width/2,pg.height-pg.height*.025);c.restore();});
+ commitHistory();renderCurrentPage();toast('Page numbers added');};
+$('#pe-m-png').onclick=()=>{if(!state.pages.length)return;flattenPage(state.pages[state.currentPage]).toBlob(b=>downloadBlob(b,`${baseName()}-page-${state.currentPage+1}.png`));};
+})();
+</script>
+<!-- ===== END UPGRADE ===== -->
 </body>
 </html>
