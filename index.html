@@ -244,9 +244,6 @@
     transition:border-color .1s ease,color .1s ease;
   }
   .btn-sm:hover{border-color:var(--accent);color:var(--accent-strong);}
-  .btn-sm.toggle-active{border-color:var(--accent);color:var(--accent-strong);background:var(--accent-soft);}
-  .toggle-row{display:flex;gap:6px;flex-wrap:wrap;}
-  .toggle-row .btn-sm{flex:none;min-width:34px;padding:6px 9px;}
 
   /* Stage */
   #stage-wrap{
@@ -341,18 +338,6 @@
   }
   .textrun-card textarea:focus{outline:none;border-color:var(--accent);}
   .textrun-card .tr-label{font-size:9.5px;color:var(--text-faint);margin-bottom:5px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.05em;}
-
-  .note-card{
-    background:var(--panel-2);border:1px solid var(--border-soft);border-radius:5px;padding:8px;margin-bottom:7px;cursor:pointer;
-  }
-  .note-card.active{border-color:var(--accent);background:var(--accent-soft);}
-  .note-card .nc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
-  .note-card .nc-label{font-size:9.5px;color:var(--text-faint);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.05em;}
-  .note-card textarea{
-    width:100%;background:var(--bg);border:1px solid var(--border-soft);color:var(--text);
-    border-radius:4px;padding:7px;font-size:12px;font-family:'DM Sans',sans-serif;resize:vertical;min-height:44px;
-  }
-  .note-card textarea:focus{outline:none;border-color:var(--accent);}
 
   /* Status bar */
   #statusbar{
@@ -474,31 +459,6 @@
   #dash-empty .mark-lg svg{width:24px;height:24px;}
   #dash-empty h2{font-size:18px;color:var(--text-dim);font-weight:700;margin:0;}
   #dash-empty p{font-size:12.5px;max-width:360px;line-height:1.65;margin:0;}
-
-  /* ---------- Custom size modal ---------- */
-  #modal-overlay{
-    position:fixed;inset:0;background:#000000a0;display:none;align-items:center;justify-content:center;z-index:1000;
-  }
-  #modal-overlay.show{display:flex;}
-  #modal-box{
-    background:#232326;border:1px solid var(--border);border-radius:8px;padding:20px;width:300px;
-    box-shadow:0 20px 60px #000c;
-  }
-  #modal-box h3{margin:0 0 14px;font-size:14px;color:var(--text);}
-  #modal-box .field{margin-bottom:12px;}
-  #modal-box .modal-row{display:flex;gap:8px;}
-  #modal-box .modal-row .field{flex:1;}
-  #modal-box .modal-actions{display:flex;gap:8px;margin-top:16px;justify-content:flex-end;}
-  #modal-box input[type=number], #modal-box input[type=text]{
-    width:100%;background:var(--panel-3);border:1px solid var(--border);color:var(--text);
-    padding:6px 8px;border-radius:4px;font-size:12.5px;font-family:inherit;
-  }
-  #modal-box .preset-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
-  #modal-box .preset-row button{
-    background:var(--panel-3);border:1px solid var(--border);color:var(--text-dim);
-    padding:5px 9px;border-radius:4px;font-size:11px;cursor:pointer;
-  }
-  #modal-box .preset-row button:hover{border-color:var(--accent);color:var(--accent-strong);}
 </style>
 </head>
 <body class="view-dashboard">
@@ -520,7 +480,6 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
         <input type="text" id="dash-search-input" placeholder="Search documents…">
       </div>
-      <button class="tb-btn" id="dash-blank-btn">+ Custom size…</button>
       <button class="tb-btn primary" id="dash-new-btn">+ New document</button>
     </div>
   </header>
@@ -529,7 +488,7 @@
   <div id="dash-empty" style="display:none;">
     <div class="mark-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div>
     <h2>No documents yet</h2>
-    <p>Import a PDF, PPTX, PNG or JPG to start editing, or create a blank canvas at a custom size. Every change is saved automatically to this browser — nothing leaves your device.</p>
+    <p>Import a PDF, PPTX, PNG or JPG to start editing. Every change is saved automatically to this browser — nothing leaves your device.</p>
     <button class="tb-btn primary" id="dash-empty-new">Import a file</button>
   </div>
 </div>
@@ -573,7 +532,6 @@
       <button class="menu-label">Object</button>
       <div class="menu-dropdown">
         <button class="menu-opt" id="menu-addpage">Duplicate page</button>
-        <button class="menu-opt" id="menu-custompage">New page (custom size)…</button>
         <button class="menu-opt" id="menu-rotate">Rotate page 90°</button>
         <button class="menu-opt" id="menu-delpage">Delete page</button>
       </div>
@@ -581,7 +539,7 @@
     <div class="menu-item" data-menu="help">
       <button class="menu-label">Help</button>
       <div class="menu-dropdown">
-        <div class="menu-opt" style="cursor:default;" id="menu-about">V, P, T, R, O, L, A, H, U, K, N, E, C — tool shortcuts</div>
+        <div class="menu-opt" style="cursor:default;" id="menu-about">V, P, T, R, O, L, A, H, E, C — tool shortcuts</div>
       </div>
     </div>
   </div>
@@ -633,11 +591,9 @@
       <div class="tabs">
         <button class="tab-btn active" data-tab="pages">Pages</button>
         <button class="tab-btn" data-tab="text">Text</button>
-        <button class="tab-btn" data-tab="notes">Notes</button>
       </div>
       <div class="tab-panel active" id="tab-pages"></div>
       <div class="tab-panel" id="tab-text"></div>
-      <div class="tab-panel" id="tab-notes"></div>
     </div>
 
   </div>
@@ -659,22 +615,6 @@
 <input type="file" id="file-input" accept=".pdf,.pptx,.png,.jpg,.jpeg">
 <div id="toast"></div>
 
-<!-- Custom page size modal -->
-<div id="modal-overlay">
-  <div id="modal-box">
-    <h3 id="modal-title">New custom canvas</h3>
-    <div class="preset-row" id="modal-presets"></div>
-    <div class="modal-row">
-      <div class="field"><label>Width (px)</label><input type="number" id="modal-width" min="16" max="6000" value="1600"></div>
-      <div class="field"><label>Height (px)</label><input type="number" id="modal-height" min="16" max="6000" value="1200"></div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-sm" id="modal-cancel">Cancel</button>
-      <button class="btn-sm toggle-active" id="modal-confirm">Create</button>
-    </div>
-  </div>
-</div>
-
 <script>
 'use strict';
 if (window.pdfjsLib) {
@@ -693,9 +633,6 @@ const ICONS = {
   line: '<path d="M4 20L20 4"/>',
   arrow: '<path d="M4 20L20 4"/><path d="M20 4h-7"/><path d="M20 4v7"/>',
   highlight: '<path d="M3 21h18"/><path d="M7 17l9-9 3 3-9 9H7v-3z"/>',
-  underline: '<path d="M5 4v7a7 7 0 0014 0V4"/><path d="M4 20h16"/>',
-  strike: '<path d="M6 4h9a3.5 3.5 0 013.5 3.5c0 1.2-.6 2.1-1.6 2.7"/><path d="M3 12h18"/><path d="M8.5 12c-.9.6-1.4 1.4-1.4 2.4C7.1 16.6 9 18 12 18c2.6 0 4.4-1 5-2.6"/>',
-  note: '<path d="M21 15a2 2 0 01-2 2H8l-5 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>',
   eraser: '<path d="M17 3l4 4-9.5 9.5H7L3 12.5z"/><path d="M7 21h14"/>',
   crop: '<path d="M6 2v14a2 2 0 002 2h14"/><path d="M18 22V8a2 2 0 00-2-2H2"/>',
   image: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>',
@@ -708,11 +645,6 @@ const ICONS = {
   pencil: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/>',
 };
 function svgIcon(name){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]}</svg>`; }
-
-/* ============================================================
-   FONTS
-   ============================================================ */
-const FONT_FAMILIES = ["DM Sans","Syne","DM Mono","Georgia","Arial","Times New Roman","Courier New","Verdana"];
 
 /* ============================================================
    STATE
@@ -790,9 +722,6 @@ const TOOLS = [
   {id:'line', icon:'line', label:'Line (L)'},
   {id:'arrow', icon:'arrow', label:'Arrow (A)'},
   {id:'highlight', icon:'highlight', label:'Highlighter (H)'},
-  {id:'underline', icon:'underline', label:'Underline (U)'},
-  {id:'strike', icon:'strike', label:'Strikethrough (K)'},
-  {id:'note', icon:'note', label:'Sticky note (N)'},
   {id:'eraser', icon:'eraser', label:'Eraser (E)'},
   {id:'crop', icon:'crop', label:'Crop (C)'},
   {id:'image', icon:'image', label:'Insert image'},
@@ -812,7 +741,7 @@ function buildToolRail(){
     };
     rail.appendChild(btn);
     if (t.id==='text') { const sep=document.createElement('div'); sep.className='tool-sep'; rail.appendChild(sep); }
-    if (t.id==='strike') { const sep=document.createElement('div'); sep.className='tool-sep'; rail.appendChild(sep); }
+    if (t.id==='highlight') { const sep=document.createElement('div'); sep.className='tool-sep'; rail.appendChild(sep); }
   });
 }
 function setTool(id){
@@ -848,7 +777,6 @@ $('#menu-zoomin').onclick = () => $('#zoom-in').click();
 $('#menu-zoomout').onclick = () => $('#zoom-out').click();
 $('#menu-zoomfit').onclick = () => { state.zoom = 1; applyZoomStyle(); updateStatus(); };
 $('#menu-addpage').onclick = () => { if (state.pages.length) addOrDuplicatePage(); };
-$('#menu-custompage').onclick = () => { if (state.pages.length) openCustomSizeModal('page'); };
 $('#menu-rotate').onclick = () => { if (state.pages.length) rotatePage(state.currentPage); };
 $('#menu-delpage').onclick = () => { if (state.pages.length) deletePage(state.currentPage); };
 $('#menu-close').onclick = () => { if (state.pages.length) switchView('dashboard'); };
@@ -865,10 +793,7 @@ function syncMenuState(){
 const TOOL_META = {
   select:{label:'Move / Select', key:'V'}, pen:{label:'Pencil', key:'P'}, text:{label:'Type', key:'T'},
   rect:{label:'Rectangle', key:'R'}, ellipse:{label:'Ellipse', key:'O'}, line:{label:'Line', key:'L'},
-  arrow:{label:'Arrow', key:'A'}, highlight:{label:'Highlighter', key:'H'},
-  underline:{label:'Underline', key:'U'}, strike:{label:'Strikethrough', key:'K'},
-  note:{label:'Sticky note', key:'N'},
-  eraser:{label:'Eraser', key:'E'},
+  arrow:{label:'Arrow', key:'A'}, highlight:{label:'Highlighter', key:'H'}, eraser:{label:'Eraser', key:'E'},
   crop:{label:'Crop', key:'C'},
 };
 function updateOptionsBar(){
@@ -877,15 +802,12 @@ function updateOptionsBar(){
   let html = `<span class="ob-toolname">${meta.label}</span>`;
   if (meta.key) html += `<span class="ob-kbd">${meta.key}</span>`;
 
-  if (['pen','rect','ellipse','line','arrow','highlight','underline','strike','note'].includes(state.tool)){
+  if (['pen','rect','ellipse','line','arrow','highlight'].includes(state.tool)){
     html += `<div class="ob-group">${COLORS.map(c=>`<div class="ob-swatch ${c===state.color?'selected':''}" data-obcolor="${c}" style="background:${c}"></div>`).join('')}</div>`;
-    if (['pen','rect','ellipse','line','arrow','highlight','underline','strike'].includes(state.tool)){
-      html += `<div class="ob-sep"></div><span>Weight</span>`;
-    }
+    html += `<div class="ob-sep"></div><span>Weight</span>`;
   }
   if (state.tool === 'text'){
     html += `<div class="ob-group">${COLORS.map(c=>`<div class="ob-swatch ${c===state.color?'selected':''}" data-obcolor="${c}" style="background:${c}"></div>`).join('')}</div>`;
-    html += `<div class="ob-sep"></div><select id="ob-font" style="width:auto;">${FONT_FAMILIES.map(f=>`<option value="${f}" ${f===state.fontFamily?'selected':''}>${f}</option>`).join('')}</select>`;
   }
   if (state.pages.length){
     html += `<div class="spacer" style="flex:1"></div>`;
@@ -900,8 +822,6 @@ function updateOptionsBar(){
   bar.querySelectorAll('[data-obcolor]').forEach(sw=>{
     sw.onclick = () => { applyColorChange(sw.dataset.obcolor); updateOptionsBar(); };
   });
-  const fontSel = $('#ob-font');
-  if (fontSel) fontSel.onchange = () => { applyFontFamilyChange(fontSel.value); };
   const prev = $('#ob-prev'), next = $('#ob-next');
   if (prev) prev.onclick = () => gotoPage(state.currentPage-1);
   if (next) next.onclick = () => gotoPage(state.currentPage+1);
@@ -910,7 +830,7 @@ function updateOptionsBar(){
 function gotoPage(i){
   if (i<0 || i>=state.pages.length) return;
   state.currentPage = i; state.selectedObjectId = null;
-  renderCurrentPage(); buildPagesTab(); buildTextTab(); buildNotesTab(); updateStatus(); updateOptionsBar();
+  renderCurrentPage(); buildPagesTab(); buildTextTab(); updateStatus(); updateOptionsBar();
 }
 
 /* ============================================================
@@ -918,7 +838,7 @@ function gotoPage(i){
    ============================================================ */
 function buildLeftPanel(){
   const p = $('#left-panel');
-  const showsStroke = ['pen','rect','ellipse','line','arrow','highlight','underline','strike'].includes(state.tool);
+  const showsStroke = ['pen','rect','ellipse','line','arrow','highlight'].includes(state.tool);
   const showsText = state.tool === 'text';
   const showsFill = ['rect','ellipse'].includes(state.tool);
 
@@ -927,7 +847,7 @@ function buildLeftPanel(){
   if (state.tool === 'select'){
     const obj = getSelectedObject();
     if (!obj){
-      html += `<p class="hint">Select an object on the canvas to edit its color, size, font or text. Use Delete/Backspace to remove it.</p>`;
+      html += `<p class="hint">Select an object on the canvas to edit its color, size or text. Use Delete/Backspace to remove it.</p>`;
     } else {
       html += colorField(obj.color || state.color, c=>{ obj.color = c; commitHistory(); redrawOverlay(); });
       if (obj.type !== 'path'){
@@ -935,16 +855,6 @@ function buildLeftPanel(){
       }
       if (obj.type === 'text'){
         html += fontSizeField(obj.fontSize || state.fontSize, s=>{ obj.fontSize = s; commitHistory(); redrawOverlay(); });
-        html += fontFamilyField(obj.fontFamily || state.fontFamily);
-        html += `<div class="field"><label>Style</label><div class="toggle-row">
-          <button class="btn-sm ${obj.bold?'toggle-active':''}" id="obj-toggle-bold" style="font-weight:800;">B</button>
-          <button class="btn-sm ${obj.italic?'toggle-active':''}" id="obj-toggle-italic" style="font-style:italic;">I</button>
-          <button class="btn-sm ${obj.underline?'toggle-active':''}" id="obj-toggle-underline" style="text-decoration:underline;">U</button>
-          <button class="btn-sm ${obj.strike?'toggle-active':''}" id="obj-toggle-strike" style="text-decoration:line-through;">S</button>
-        </div></div>`;
-      }
-      if (obj.type === 'note'){
-        html += `<div class="field"><label>Comment</label><textarea class="text-input" id="obj-note-text" rows="4" style="resize:vertical;">${escapeHtml(obj.text||'')}</textarea></div>`;
       }
       html += `<div class="btn-row"><button class="btn-sm" id="delete-obj">Delete object</button></div>`;
     }
@@ -952,22 +862,9 @@ function buildLeftPanel(){
     if (showsStroke) html += colorField(state.color, c=>{ state.color = c; });
     if (showsFill) html += `<p class="hint">Shapes are drawn as outlines. Select the object afterward to change its stroke color or width.</p>`;
     if (showsStroke) html += strokeField(state.strokeWidth, w=>{ state.strokeWidth = w; });
-    if (showsText){
-      html += fontSizeField(state.fontSize, s=>{ state.fontSize = s; });
-      html += fontFamilyField(state.fontFamily);
-      html += `<div class="field"><label>Style</label><div class="toggle-row">
-        <button class="btn-sm ${state.textBold?'toggle-active':''}" id="tool-toggle-bold" style="font-weight:800;">B</button>
-        <button class="btn-sm ${state.textItalic?'toggle-active':''}" id="tool-toggle-italic" style="font-style:italic;">I</button>
-        <button class="btn-sm ${state.textUnderline?'toggle-active':''}" id="tool-toggle-underline" style="text-decoration:underline;">U</button>
-        <button class="btn-sm ${state.textStrike?'toggle-active':''}" id="tool-toggle-strike" style="text-decoration:line-through;">S</button>
-      </div></div>`;
-    }
+    if (showsText) html += fontSizeField(state.fontSize, s=>{ state.fontSize = s; });
     if (state.tool === 'crop') html += `<p class="hint">Drag a rectangle on the canvas, then press <b>Enter</b> to crop the page, or <b>Esc</b> to cancel.</p>`;
     if (state.tool === 'eraser') html += `<p class="hint">Click any annotation to remove it.</p>`;
-    if (state.tool === 'highlight') html += `<p class="hint">Drag across text to lay a translucent highlight band on top of it.</p>`;
-    if (state.tool === 'underline') html += `<p class="hint">Drag along the bottom of a line of text to underline it.</p>`;
-    if (state.tool === 'strike') html += `<p class="hint">Drag across a line of text to strike it through.</p>`;
-    if (state.tool === 'note') html += `<p class="hint">Click anywhere to drop a sticky note. Edit its text here, on the canvas, or in the Notes tab.</p>`;
   }
 
   p.innerHTML = html;
@@ -994,11 +891,6 @@ function fontSizeField(current, onChange){
       <span class="range-val">${current}px</span>
     </div></div>`;
 }
-function fontFamilyField(current){
-  return `<div class="field"><label>Font</label>
-    <select id="font-family-select">${FONT_FAMILIES.map(f=>`<option value="${f}" ${f===current?'selected':''}>${f}</option>`).join('')}</select>
-  </div>`;
-}
 function wireLeftPanelEvents(){
   document.querySelectorAll('.swatch[data-color]').forEach(sw=>{
     sw.onclick = () => {
@@ -1021,41 +913,8 @@ function wireLeftPanelEvents(){
     fontRange.nextElementSibling.textContent = s+'px';
     applyFontChange(s);
   };
-  const fontFamilySel = $('#font-family-select');
-  if (fontFamilySel) fontFamilySel.onchange = () => applyFontFamilyChange(fontFamilySel.value);
-
   const delBtn = $('#delete-obj');
   if (delBtn) delBtn.onclick = () => { deleteSelectedObject(); };
-
-  const noteText = $('#obj-note-text');
-  if (noteText) noteText.oninput = () => {
-    const obj = getSelectedObject();
-    if (obj){ obj.text = noteText.value; scheduleSave(); buildNotesTab(); redrawOverlay(); }
-  };
-
-  wireStyleToggle('#obj-toggle-bold', 'bold', true);
-  wireStyleToggle('#obj-toggle-italic', 'italic', true);
-  wireStyleToggle('#obj-toggle-underline', 'underline', true);
-  wireStyleToggle('#obj-toggle-strike', 'strike', true);
-  wireStyleToggle('#tool-toggle-bold', 'textBold', false);
-  wireStyleToggle('#tool-toggle-italic', 'textItalic', false);
-  wireStyleToggle('#tool-toggle-underline', 'textUnderline', false);
-  wireStyleToggle('#tool-toggle-strike', 'textStrike', false);
-}
-function wireStyleToggle(sel, prop, onObject){
-  const btn = $(sel);
-  if (!btn) return;
-  btn.onclick = () => {
-    if (onObject){
-      const obj = getSelectedObject();
-      if (!obj) return;
-      obj[prop] = !obj[prop];
-      commitHistory();
-    } else {
-      state[prop] = !state[prop];
-    }
-    buildLeftPanel(); redrawOverlay();
-  };
 }
 function applyColorChange(c){
   if (state.tool === 'select' && getSelectedObject()){
@@ -1076,12 +935,6 @@ function applyFontChange(s){
     getSelectedObject().fontSize = s; commitHistory();
   } else { state.fontSize = s; }
   redrawOverlay();
-}
-function applyFontFamilyChange(f){
-  if (state.tool === 'select' && getSelectedObject() && getSelectedObject().type==='text'){
-    getSelectedObject().fontFamily = f; commitHistory();
-  } else { state.fontFamily = f; }
-  buildLeftPanel(); updateOptionsBar(); redrawOverlay();
 }
 
 /* ============================================================
@@ -1123,7 +976,6 @@ async function loadFile(file){
   renderCurrentPage();
   buildPagesTab();
   buildTextTab();
-  buildNotesTab();
   updateStatus();
   updateOptionsBar();
 
@@ -1146,43 +998,6 @@ function resetState(){
   state.projectName = '';
   state.originalPptxBlob = null;
   state._createdAt = null;
-}
-
-/* ---- Blank canvas (custom size) ---- */
-function createBlankCanvas(w, h){
-  const c = document.createElement('canvas');
-  c.width = w; c.height = h;
-  const ctx = c.getContext('2d');
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0,0,w,h);
-  return c;
-}
-async function startBlankDocument(w, h){
-  resetState();
-  state.fileType = 'png';
-  state.fileName = 'Untitled canvas';
-  $('#filename').textContent = state.fileName;
-  const c = createBlankCanvas(w, h);
-  state.pages.push({ baseCanvas:c, objects:[], width:w, height:h });
-
-  $('#format-badge').textContent = state.fileType;
-  $('#btn-export').disabled = false;
-  emptyState.style.display = 'none';
-  canvasHolder.style.display = 'block';
-  state.currentPage = 0;
-  pushHistorySnapshotInit();
-  renderCurrentPage();
-  buildPagesTab();
-  buildTextTab();
-  buildNotesTab();
-  updateStatus();
-  updateOptionsBar();
-
-  state.projectId = newProjectId();
-  state.projectName = state.fileName;
-  state._createdAt = Date.now();
-  switchView('editor');
-  await saveCurrentProject();
 }
 
 /* ---- PNG / JPG ---- */
@@ -1337,13 +1152,6 @@ function redrawOverlay(){
   if (dragState && dragState.previewObj) drawObject(octx, dragState.previewObj, false);
   if (dragState && dragState.cropRect) drawCropRect(octx, dragState.cropRect);
 }
-function fontString(obj){
-  const size = obj.fontSize;
-  const family = obj.fontFamily || 'DM Sans';
-  const italic = obj.italic ? 'italic ' : '';
-  const weight = obj.bold ? '700 ' : '';
-  return `${italic}${weight}${size}px '${family}', sans-serif`;
-}
 function drawObject(ctx, obj, selected){
   ctx.save();
   ctx.strokeStyle = obj.color; ctx.fillStyle = obj.color;
@@ -1374,12 +1182,6 @@ function drawObject(ctx, obj, selected){
     ctx.beginPath();
     obj.points.forEach((p,i)=> i===0 ? ctx.moveTo(p.x,p.y) : ctx.lineTo(p.x,p.y));
     ctx.stroke();
-  } else if (obj.type === 'underline' || obj.type === 'strike'){
-    ctx.globalAlpha = 1;
-    ctx.lineWidth = Math.max(1.5, (obj.strokeWidth || 4) * 0.5);
-    ctx.beginPath();
-    obj.points.forEach((p,i)=> i===0 ? ctx.moveTo(p.x,p.y) : ctx.lineTo(p.x,p.y));
-    ctx.stroke();
   } else if (obj.type === 'rect'){
     ctx.strokeRect(obj.x, obj.y, obj.w, obj.h);
   } else if (obj.type === 'ellipse'){
@@ -1391,69 +1193,14 @@ function drawObject(ctx, obj, selected){
   } else if (obj.type === 'arrow'){
     drawArrow(ctx, obj.x, obj.y, obj.x2, obj.y2, obj.strokeWidth||4);
   } else if (obj.type === 'text'){
-    ctx.font = fontString(obj);
+    ctx.font = `${obj.fontSize}px 'DM Sans', sans-serif`;
     ctx.textBaseline = 'top';
-    const lines = (obj.text||'').split('\n');
-    lines.forEach((line,i)=>{
-      const ly = obj.y + i*obj.fontSize*1.25;
-      ctx.fillText(line, obj.x, ly);
-      if (obj.underline || obj.strike){
-        const w = ctx.measureText(line).width;
-        ctx.save();
-        ctx.lineWidth = Math.max(1, obj.fontSize*0.06);
-        ctx.strokeStyle = obj.color;
-        ctx.beginPath();
-        if (obj.underline){
-          const uy = ly + obj.fontSize*1.05;
-          ctx.moveTo(obj.x, uy); ctx.lineTo(obj.x+w, uy);
-        }
-        if (obj.strike){
-          const sy = ly + obj.fontSize*0.55;
-          ctx.moveTo(obj.x, sy); ctx.lineTo(obj.x+w, sy);
-        }
-        ctx.stroke();
-        ctx.restore();
-      }
-    });
+    (obj.text||'').split('\n').forEach((line,i)=> ctx.fillText(line, obj.x, obj.y + i*obj.fontSize*1.25));
   } else if (obj.type === 'image'){
     if (obj.img) ctx.drawImage(obj.img, obj.x, obj.y, obj.w, obj.h);
-  } else if (obj.type === 'note'){
-    drawNoteIcon(ctx, obj);
   }
   ctx.restore();
   if (selected) drawSelectionBox(ctx, obj);
-}
-function drawNoteIcon(ctx, obj){
-  const s = obj.size || 28;
-  ctx.save();
-  ctx.globalAlpha = 1;
-  ctx.fillStyle = obj.color || '#f2c84b';
-  ctx.strokeStyle = '#00000040';
-  ctx.lineWidth = 1;
-  // rounded speech-bubble note shape
-  const x = obj.x, y = obj.y, w = s, h = s*0.82;
-  const r = 4;
-  ctx.beginPath();
-  ctx.moveTo(x+r, y);
-  ctx.lineTo(x+w-r, y);
-  ctx.quadraticCurveTo(x+w, y, x+w, y+r);
-  ctx.lineTo(x+w, y+h-r);
-  ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
-  ctx.lineTo(x+w*0.35, y+h);
-  ctx.lineTo(x+w*0.2, y+h+s*0.28);
-  ctx.lineTo(x+w*0.22, y+h);
-  ctx.lineTo(x+r, y+h);
-  ctx.quadraticCurveTo(x, y+h, x, y+h-r);
-  ctx.lineTo(x, y+r);
-  ctx.quadraticCurveTo(x, y, x+r, y);
-  ctx.closePath();
-  ctx.fill(); ctx.stroke();
-  ctx.fillStyle = '#1a1a1a';
-  ctx.font = `${Math.round(s*0.45)}px 'DM Sans', sans-serif`;
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText(String(obj.noteNum||''), x+w/2, y+h*0.46);
-  ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
-  ctx.restore();
 }
 function drawArrow(ctx,x1,y1,x2,y2,width){
   ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
@@ -1466,7 +1213,7 @@ function drawArrow(ctx,x1,y1,x2,y2,width){
   ctx.closePath(); ctx.fill();
 }
 function getBBox(obj){
-  if (obj.type==='path' || obj.type==='highlight' || obj.type==='underline' || obj.type==='strike'){
+  if (obj.type==='path' || obj.type==='highlight'){
     const xs = obj.points.map(p=>p.x), ys = obj.points.map(p=>p.y);
     return {x:Math.min(...xs), y:Math.min(...ys), w:Math.max(...xs)-Math.min(...xs), h:Math.max(...ys)-Math.min(...ys)};
   }
@@ -1475,13 +1222,9 @@ function getBBox(obj){
   }
   if (obj.type==='text'){
     const lines = (obj.text||'').split('\n');
-    octx.font = fontString(obj);
+    octx.font = `${obj.fontSize}px 'DM Sans', sans-serif`;
     const w = Math.max(...lines.map(l=>octx.measureText(l).width), 20);
     return {x:obj.x, y:obj.y, w, h: lines.length*obj.fontSize*1.25};
-  }
-  if (obj.type==='note'){
-    const s = obj.size || 28;
-    return {x:obj.x, y:obj.y, w:s, h:s*0.82 + s*0.28};
   }
   return {x:obj.x, y:obj.y, w:obj.w, h:obj.h};
 }
@@ -1533,11 +1276,6 @@ function hitTest(pt){
   }
   return null;
 }
-function nextNoteNum(){
-  const pg = state.pages[state.currentPage];
-  const nums = pg.objects.filter(o=>o.type==='note').map(o=>o.noteNum||0);
-  return (nums.length ? Math.max(...nums) : 0) + 1;
-}
 
 overlayCanvas.addEventListener('pointerdown', e=>{
   if (!state.pages.length) return;
@@ -1570,13 +1308,12 @@ overlayCanvas.addEventListener('pointerdown', e=>{
     if (hit){
       const pg = state.pages[state.currentPage];
       pg.objects = pg.objects.filter(o=>o.id!==hit.id);
-      commitHistory(); redrawOverlay(); buildNotesTab();
+      commitHistory(); redrawOverlay();
     }
     return;
   }
-  if (tool === 'pen' || tool === 'highlight' || tool === 'underline' || tool === 'strike'){
-    const typeMap = {pen:'path', highlight:'highlight', underline:'underline', strike:'strike'};
-    dragState = { mode:'draw-path', points:[{...pt, pressure}], type: typeMap[tool] };
+  if (tool === 'pen' || tool === 'highlight'){
+    dragState = { mode:'draw-path', points:[{...pt, pressure}], type: tool==='highlight' ? 'highlight':'path' };
     return;
   }
   if (['rect','ellipse','line','arrow'].includes(tool)){
@@ -1589,10 +1326,6 @@ overlayCanvas.addEventListener('pointerdown', e=>{
   }
   if (tool === 'text'){
     createTextObject(pt);
-    return;
-  }
-  if (tool === 'note'){
-    createNoteObject(pt);
     return;
   }
 });
@@ -1680,7 +1413,7 @@ window.addEventListener('keydown', e=>{
   } else if ((e.ctrlKey||e.metaKey) && (e.key==='y' || (e.key==='z'&&e.shiftKey))){
     e.preventDefault(); redo();
   } else if (!isTypingTarget(e.target)) {
-    const map = {v:'select', p:'pen', t:'text', r:'rect', o:'ellipse', l:'line', a:'arrow', h:'highlight', u:'underline', k:'strike', n:'note', e:'eraser', c:'crop'};
+    const map = {v:'select', p:'pen', t:'text', r:'rect', o:'ellipse', l:'line', a:'arrow', h:'highlight', e:'eraser', c:'crop'};
     if (map[e.key.toLowerCase()]) setTool(map[e.key.toLowerCase()]);
   }
 });
@@ -1690,16 +1423,12 @@ function deleteSelectedObject(){
   const pg = state.pages[state.currentPage];
   pg.objects = pg.objects.filter(o=>o.id!==state.selectedObjectId);
   state.selectedObjectId = null;
-  commitHistory(); buildLeftPanel(); redrawOverlay(); buildNotesTab();
+  commitHistory(); buildLeftPanel(); redrawOverlay();
 }
 
 function createTextObject(pt){
   const pg = state.pages[state.currentPage];
-  const obj = {
-    id:newId(), type:'text', x:pt.x, y:pt.y, text:'Text', color: state.color, fontSize: state.fontSize,
-    fontFamily: state.fontFamily, bold: !!state.textBold, italic: !!state.textItalic,
-    underline: !!state.textUnderline, strike: !!state.textStrike,
-  };
+  const obj = { id:newId(), type:'text', x:pt.x, y:pt.y, text:'Text', color: state.color, fontSize: state.fontSize };
   pg.objects.push(obj);
   state.selectedObjectId = obj.id;
   commitHistory();
@@ -1717,10 +1446,6 @@ function openInlineTextEditor(obj){
   box.style.width = Math.max(120, 240*scaleX) + 'px';
   box.style.height = (obj.fontSize*1.5*scaleY) + 'px';
   box.style.fontSize = (obj.fontSize*scaleY) + 'px';
-  box.style.fontFamily = `'${obj.fontFamily||'DM Sans'}', sans-serif`;
-  box.style.fontWeight = obj.bold ? '700' : '400';
-  box.style.fontStyle = obj.italic ? 'italic' : 'normal';
-  box.style.textDecoration = [obj.underline?'underline':'', obj.strike?'line-through':''].filter(Boolean).join(' ');
   box.style.color = obj.color;
   box.value = obj.text === 'Text' ? '' : obj.text;
   box.placeholder = 'Type…';
@@ -1739,48 +1464,7 @@ overlayCanvas.addEventListener('dblclick', e=>{
   const pt = canvasPoint(e);
   const hit = hitTest(pt);
   if (hit && hit.type==='text'){ state.selectedObjectId = hit.id; openInlineTextEditor(hit); }
-  else if (hit && hit.type==='note'){ state.selectedObjectId = hit.id; buildLeftPanel(); openInlineNoteEditor(hit); }
 });
-
-function createNoteObject(pt){
-  const pg = state.pages[state.currentPage];
-  const obj = { id:newId(), type:'note', x:pt.x, y:pt.y, size:28, color: state.color, text:'', noteNum: nextNoteNum() };
-  pg.objects.push(obj);
-  state.selectedObjectId = obj.id;
-  commitHistory();
-  setTool('select');
-  redrawOverlay();
-  buildLeftPanel();
-  buildNotesTab();
-  openInlineNoteEditor(obj);
-}
-function openInlineNoteEditor(obj){
-  const rect = overlayCanvas.getBoundingClientRect();
-  const scaleX = rect.width / overlayCanvas.width;
-  const scaleY = rect.height / overlayCanvas.height;
-  const box = document.createElement('textarea');
-  box.className = 'text-edit-box';
-  box.style.left = (rect.left + obj.x*scaleX) + 'px';
-  box.style.top = (rect.top + (obj.y + (obj.size||28)*1.3)*scaleY) + 'px';
-  box.style.width = Math.max(140, 200*scaleX) + 'px';
-  box.style.height = (60*scaleY) + 'px';
-  box.style.fontSize = '12px';
-  box.style.background = '#232326';
-  box.style.color = '#e7e7e9';
-  box.value = obj.text || '';
-  box.placeholder = 'Comment…';
-  document.body.appendChild(box);
-  box.focus();
-  const finish = () => {
-    obj.text = box.value;
-    document.body.removeChild(box);
-    commitHistory();
-    redrawOverlay();
-    buildNotesTab();
-  };
-  box.addEventListener('blur', finish);
-  box.addEventListener('keydown', ev=>{ if (ev.key==='Enter' && !ev.shiftKey){ ev.preventDefault(); box.blur(); } });
-}
 
 function triggerImageInsert(){
   const inp = document.createElement('input');
@@ -1826,7 +1510,6 @@ function applyCrop(r){
   commitHistory();
   renderCurrentPage();
   buildPagesTab();
-  buildNotesTab();
   toast('Page cropped');
 }
 
@@ -1839,12 +1522,11 @@ function buildPagesTab(){
   const label = state.fileType==='pptx' ? 'Slide' : 'Page';
   tab.innerHTML = `<div class="btn-row" style="margin-bottom:10px;">
       <button class="btn-sm" id="page-add">+ ${state.fileType==='pptx'?'Duplicate current':'New blank'}</button>
-      ${state.fileType!=='pptx' ? `<button class="btn-sm" id="page-add-custom">+ Custom size</button>` : ''}
     </div>` +
     state.pages.map((pg,i)=>`
     <div class="page-card ${i===state.currentPage?'active':''}" data-idx="${i}">
       <div class="page-thumb"><img src="${pg.baseCanvas.toDataURL()}"></div>
-      <div class="page-meta"><div class="pnum">${label} ${i+1}</div><div class="pdesc">${pg.objects.length} annotation${pg.objects.length!==1?'s':''} · ${pg.width}×${pg.height}</div></div>
+      <div class="page-meta"><div class="pnum">${label} ${i+1}</div><div class="pdesc">${pg.objects.length} annotation${pg.objects.length!==1?'s':''}</div></div>
       <div class="page-actions">
         <button class="icon-btn" data-act="up" title="Move up">${svgIcon('up')}</button>
         <button class="icon-btn" data-act="down" title="Move down">${svgIcon('down')}</button>
@@ -1858,7 +1540,7 @@ function buildPagesTab(){
       if (e.target.closest('.icon-btn')) return;
       state.currentPage = +card.dataset.idx;
       state.selectedObjectId = null;
-      renderCurrentPage(); buildPagesTab(); buildTextTab(); buildNotesTab(); updateStatus();
+      renderCurrentPage(); buildPagesTab(); buildTextTab(); updateStatus();
     });
   });
   tab.querySelectorAll('.icon-btn').forEach(btn=>{
@@ -1874,14 +1556,12 @@ function buildPagesTab(){
   });
   const addBtn = $('#page-add');
   if (addBtn) addBtn.onclick = () => addOrDuplicatePage();
-  const addCustomBtn = $('#page-add-custom');
-  if (addCustomBtn) addCustomBtn.onclick = () => openCustomSizeModal('page');
 }
 function deletePage(idx){
   if (state.pages.length<=1){ toast("Can't delete the only page"); return; }
   state.pages.splice(idx,1);
   if (state.currentPage>=state.pages.length) state.currentPage = state.pages.length-1;
-  renderCurrentPage(); buildPagesTab(); buildTextTab(); buildNotesTab(); updateStatus();
+  renderCurrentPage(); buildPagesTab(); buildTextTab(); updateStatus();
   scheduleSave();
 }
 function movePage(idx, dir){
@@ -1937,49 +1617,9 @@ function addOrDuplicatePage(){
   state.pages.splice(state.currentPage+1, 0, newPg);
   state.currentPage += 1;
   commitHistory();
-  renderCurrentPage(); buildPagesTab(); buildTextTab(); buildNotesTab(); updateStatus();
+  renderCurrentPage(); buildPagesTab(); buildTextTab(); updateStatus();
   toast(state.fileType==='pptx' ? 'Slide duplicated' : 'Page added');
 }
-function insertCustomPage(w, h){
-  const c = createBlankCanvas(w, h);
-  const newPg = { baseCanvas:c, objects:[], width:w, height:h };
-  state.pages.splice(state.currentPage+1, 0, newPg);
-  state.currentPage += 1;
-  commitHistory();
-  renderCurrentPage(); buildPagesTab(); buildTextTab(); buildNotesTab(); updateStatus();
-  toast('Custom page added');
-}
-
-/* ============================================================
-   CUSTOM SIZE MODAL
-   ============================================================ */
-const SIZE_PRESETS = [
-  {label:'Letter', w:850, h:1100}, {label:'A4', w:794, h:1123},
-  {label:'Square', w:1200, h:1200}, {label:'Widescreen', w:1920, h:1080},
-  {label:'Story', w:1080, h:1920}, {label:'Business card', w:1050, h:600},
-];
-let modalMode = 'document'; // 'document' | 'page'
-function openCustomSizeModal(mode){
-  modalMode = mode;
-  $('#modal-title').textContent = mode==='page' ? 'New page (custom size)' : 'New custom canvas';
-  $('#modal-presets').innerHTML = SIZE_PRESETS.map(p=>`<button data-w="${p.w}" data-h="${p.h}">${p.label}</button>`).join('');
-  $('#modal-presets').querySelectorAll('button').forEach(b=>{
-    b.onclick = () => { $('#modal-width').value = b.dataset.w; $('#modal-height').value = b.dataset.h; };
-  });
-  $('#modal-overlay').classList.add('show');
-  $('#modal-width').focus();
-}
-function closeCustomSizeModal(){ $('#modal-overlay').classList.remove('show'); }
-$('#modal-cancel').onclick = closeCustomSizeModal;
-$('#modal-overlay').addEventListener('click', e=>{ if (e.target.id==='modal-overlay') closeCustomSizeModal(); });
-$('#modal-confirm').onclick = () => {
-  const w = Math.max(16, Math.min(6000, +$('#modal-width').value || 1600));
-  const h = Math.max(16, Math.min(6000, +$('#modal-height').value || 1200));
-  closeCustomSizeModal();
-  if (modalMode === 'page') insertCustomPage(w, h);
-  else startBlankDocument(w, h);
-};
-$('#dash-blank-btn').onclick = () => openCustomSizeModal('document');
 
 /* ============================================================
    TEXT TAB (pptx text-run editing)
@@ -1988,7 +1628,7 @@ function buildTextTab(){
   const tab = $('#tab-text');
   const pg = state.pages[state.currentPage];
   if (state.fileType !== 'pptx'){
-    tab.innerHTML = `<p class="hint">Text editing of embedded content is available for PPTX files. For PDF and PNG, use the Text tool on the canvas to add or edit text — select any text object to change its content, font, size or style.</p>`;
+    tab.innerHTML = `<p class="hint">Text editing of embedded content is available for PPTX files. For PDF and PNG, use the Text tool on the canvas to add new text on top of the page.</p>`;
     return;
   }
   if (!pg || !pg.textRuns || !pg.textRuns.length){
@@ -2008,46 +1648,6 @@ function buildTextTab(){
   });
 }
 function escapeHtml(s){ return (s||'').replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
-
-/* ============================================================
-   NOTES TAB (sticky notes / comments on the current page)
-   ============================================================ */
-function buildNotesTab(){
-  const tab = $('#tab-notes');
-  const pg = state.pages[state.currentPage];
-  const notes = pg ? pg.objects.filter(o=>o.type==='note') : [];
-  if (!notes.length){
-    tab.innerHTML = `<p class="hint">No sticky notes on this page yet. Pick the Sticky note tool (N) and click on the canvas to drop one.</p>`;
-    return;
-  }
-  tab.innerHTML = notes.map(n => `
-    <div class="note-card ${n.id===state.selectedObjectId?'active':''}" data-id="${n.id}">
-      <div class="nc-head"><span class="nc-label">Note ${n.noteNum}</span><button class="icon-btn" data-act="del-note" data-id="${n.id}" title="Delete">${svgIcon('trash')}</button></div>
-      <textarea data-id="${n.id}" placeholder="Comment…">${escapeHtml(n.text||'')}</textarea>
-    </div>`).join('');
-  tab.querySelectorAll('.note-card').forEach(card=>{
-    card.addEventListener('click', e=>{
-      if (e.target.closest('textarea') || e.target.closest('[data-act]')) return;
-      state.selectedObjectId = card.dataset.id;
-      setTool('select');
-      buildLeftPanel(); buildNotesTab(); redrawOverlay();
-    });
-  });
-  tab.querySelectorAll('textarea').forEach(ta=>{
-    ta.addEventListener('input', ()=>{
-      const obj = pg.objects.find(o=>o.id===ta.dataset.id);
-      if (obj){ obj.text = ta.value; scheduleSave(); redrawOverlay(); if (state.selectedObjectId===obj.id) buildLeftPanel(); }
-    });
-  });
-  tab.querySelectorAll('[data-act="del-note"]').forEach(btn=>{
-    btn.addEventListener('click', e=>{
-      e.stopPropagation();
-      pg.objects = pg.objects.filter(o=>o.id!==btn.dataset.id);
-      if (state.selectedObjectId===btn.dataset.id) state.selectedObjectId = null;
-      commitHistory(); buildLeftPanel(); redrawOverlay(); buildNotesTab();
-    });
-  });
-}
 
 /* Tab switching */
 document.querySelectorAll('.tab-btn').forEach(btn=>{
@@ -2104,7 +1704,7 @@ function restoreSnapshot(snap){
   Promise.all(promises).then(()=>{
     state.pages.length = snap.length;
     if (state.currentPage>=state.pages.length) state.currentPage = state.pages.length-1;
-    renderCurrentPage(); buildPagesTab(); buildTextTab(); buildNotesTab(); updateStatus();
+    renderCurrentPage(); buildPagesTab(); buildTextTab(); updateStatus();
   });
 }
 function undo(){
@@ -2554,7 +2154,6 @@ async function loadProjectFromRecord(record){
   renderCurrentPage();
   buildPagesTab();
   buildTextTab();
-  buildNotesTab();
   updateStatus();
   updateOptionsBar();
   setSaveStatus('saved');
@@ -2695,267 +2294,6 @@ updateStatus();
 updateOptionsBar();
 $('#btn-home').innerHTML = svgIcon('home');
 switchView('dashboard');
-</script>
-<script>
-/* ============================================================
-   PRO UPGRADE PACK — paste just above the final </script>
-   Adds: resize handles, Layers panel (reorder / hide / lock-free select),
-   opacity + shape fill, fit-to-screen, Ctrl+wheel zoom, Space-pan,
-   nudge / duplicate / arrange shortcuts, live cursor coordinates.
-   ============================================================ */
-(function(){
-  const st = document.createElement('style');
-  st.textContent = `
-    .layer-row{display:flex;align-items:center;gap:6px;padding:5px 6px;margin-bottom:4px;border:1px solid var(--border-soft);
-      border-radius:5px;background:var(--panel-2);cursor:pointer;font-size:11.5px;}
-    .layer-row:hover{border-color:#4a4a50;}
-    .layer-row.active{border-color:var(--accent);background:var(--accent-soft);}
-    .layer-row.hidden-layer .layer-name{opacity:.4;text-decoration:line-through;}
-    .layer-chip{width:12px;height:12px;border-radius:3px;border:1px solid #ffffff30;flex-shrink:0;}
-    .layer-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-    .layer-row .icon-btn{width:20px;height:20px;}
-    #stage-wrap.panning, #stage-wrap.panning #overlay-canvas{cursor:grab !important;}
-    #coords{font-variant-numeric:tabular-nums;}
-    .field-inline{display:flex;align-items:center;gap:8px;}
-    .field-inline input[type=checkbox]{accent-color:var(--accent);}
-  `;
-  document.head.appendChild(st);
-
-  /* ---------- Opacity, hidden layers, shape fill (wrap the renderer) ---------- */
-  const _draw = drawObject;
-  drawObject = function(ctx, obj, selected){
-    if (obj.hidden) return;
-    ctx.save();
-    ctx.globalAlpha = obj.opacity ?? 1;
-    if (obj.fill && (obj.type === 'rect' || obj.type === 'ellipse')){
-      ctx.fillStyle = obj.fill;
-      ctx.beginPath();
-      if (obj.type === 'rect') ctx.rect(obj.x, obj.y, obj.w, obj.h);
-      else ctx.ellipse(obj.x+obj.w/2, obj.y+obj.h/2, Math.abs(obj.w/2), Math.abs(obj.h/2), 0, 0, Math.PI*2);
-      ctx.fill();
-    }
-    _draw(ctx, obj, false);
-    ctx.restore();
-    if (selected) drawSelectionBox(ctx, obj);
-  };
-  const _hit = hitTest;
-  hitTest = function(pt){
-    const pg = state.pages[state.currentPage];
-    for (let i = pg.objects.length-1; i >= 0; i--){
-      const o = pg.objects[i]; if (o.hidden) continue;
-      const b = getBBox(o);
-      if (pt.x >= b.x-6 && pt.x <= b.x+b.w+6 && pt.y >= b.y-6 && pt.y <= b.y+b.h+6) return o;
-    }
-    return null;
-  };
-
-  /* ---------- Extra properties in the left panel ---------- */
-  const _blp = buildLeftPanel;
-  buildLeftPanel = function(){
-    _blp();
-    const obj = state.tool === 'select' ? getSelectedObject() : null;
-    if (!obj) return;
-    const p = $('#left-panel');
-    const op = Math.round((obj.opacity ?? 1) * 100);
-    let h = `<div class="field"><label>Opacity</label><div class="range-row">
-      <input type="range" id="pp-opacity" min="5" max="100" value="${op}"><span class="range-val">${op}%</span></div></div>`;
-    if (obj.type === 'rect' || obj.type === 'ellipse'){
-      h += `<div class="field"><label>Fill</label><div class="field-inline">
-        <input type="checkbox" id="pp-fill-on" ${obj.fill ? 'checked' : ''}>
-        <input type="color" id="pp-fill" value="${obj.fill || obj.color || '#5ee0c1'}"></div></div>`;
-    }
-    h += `<div class="field"><label>Arrange</label><div class="btn-row">
-      <button class="btn-sm" id="pp-front">Front</button><button class="btn-sm" id="pp-fwd">Forward</button>
-      <button class="btn-sm" id="pp-bwd">Back</button><button class="btn-sm" id="pp-back">Bottom</button></div>
-      <div class="btn-row" style="margin-top:7px"><button class="btn-sm" id="pp-dup">Duplicate (Ctrl+D)</button></div></div>`;
-    p.insertAdjacentHTML('beforeend', h);
-    const o = $('#pp-opacity');
-    o.oninput = () => { obj.opacity = o.value/100; obj.alpha = obj.opacity; o.nextElementSibling.textContent = o.value+'%'; redrawOverlay(); };
-    o.onchange = () => commitHistory();
-    const fo = $('#pp-fill-on'), fc = $('#pp-fill');
-    if (fo){
-      fo.onchange = () => { obj.fill = fo.checked ? fc.value : null; commitHistory(); redrawOverlay(); };
-      fc.oninput = () => { obj.fill = fc.value; fo.checked = true; redrawOverlay(); };
-      fc.onchange = () => commitHistory();
-    }
-    $('#pp-front').onclick = () => arrange(obj, 'front');
-    $('#pp-fwd').onclick   = () => arrange(obj, 1);
-    $('#pp-bwd').onclick   = () => arrange(obj, -1);
-    $('#pp-back').onclick  = () => arrange(obj, 'back');
-    $('#pp-dup').onclick   = () => duplicateObject(obj);
-  };
-
-  function arrange(obj, how){
-    const arr = state.pages[state.currentPage].objects;
-    const i = arr.indexOf(obj); if (i < 0) return;
-    arr.splice(i, 1);
-    let j = how === 'front' ? arr.length : how === 'back' ? 0 : Math.max(0, Math.min(arr.length, i + how));
-    arr.splice(j, 0, obj);
-    commitHistory(); redrawOverlay(); refreshLayers(true);
-  }
-  function duplicateObject(obj){
-    const pg = state.pages[state.currentPage];
-    const c = {...obj, id: newId()};
-    if (obj.points) c.points = obj.points.map(p => ({...p, x:p.x+16, y:p.y+16}));
-    else { c.x += 16; c.y += 16; if (c.x2 !== undefined){ c.x2 += 16; c.y2 += 16; } }
-    pg.objects.push(c);
-    state.selectedObjectId = c.id;
-    commitHistory(); buildLeftPanel(); redrawOverlay(); buildNotesTab(); refreshLayers(true);
-  }
-
-  /* ---------- Resize handles ---------- */
-  let rs = null;
-  overlayCanvas.addEventListener('pointerdown', e => {
-    if (spaceDown){
-      pan = {x:e.clientX, y:e.clientY, sl:$('#stage-wrap').scrollLeft, st:$('#stage-wrap').scrollTop};
-      overlayCanvas.setPointerCapture(e.pointerId);
-      e.stopImmediatePropagation(); e.preventDefault(); return;
-    }
-    if (state.tool !== 'select') return;
-    const obj = getSelectedObject();
-    if (!obj || obj.type === 'note' || obj.hidden) return;
-    const pt = canvasPoint(e), b = getBBox(obj);
-    const corners = [
-      [b.x-4, b.y-4, b.x+b.w, b.y+b.h], [b.x+b.w+4, b.y-4, b.x, b.y+b.h],
-      [b.x-4, b.y+b.h+4, b.x+b.w, b.y], [b.x+b.w+4, b.y+b.h+4, b.x, b.y]];
-    const hit = corners.find(c => Math.hypot(pt.x-c[0], pt.y-c[1]) <= 10 / Math.max(.4, state.zoom));
-    if (!hit) return;
-    e.stopImmediatePropagation(); e.preventDefault();
-    overlayCanvas.setPointerCapture(e.pointerId);
-    const o0 = {...obj, points: obj.points ? obj.points.map(p => ({...p})) : undefined};
-    rs = {obj, o0, ax:hit[2], ay:hit[3], dw:(hit[2]===b.x ? b.x+b.w : b.x) - hit[2], dh:(hit[3]===b.y ? b.y+b.h : b.y) - hit[3]};
-  }, true);
-
-  window.addEventListener('pointermove', e => {
-    if (pan){
-      const w = $('#stage-wrap');
-      w.scrollLeft = pan.sl - (e.clientX - pan.x); w.scrollTop = pan.st - (e.clientY - pan.y);
-      return;
-    }
-    if (!rs) return;
-    const pt = canvasPoint(e), {obj, o0, ax, ay} = rs;
-    let sx = Math.abs(rs.dw) < 1 ? 1 : Math.max(.05, (pt.x-ax)/rs.dw);
-    let sy = Math.abs(rs.dh) < 1 ? 1 : Math.max(.05, (pt.y-ay)/rs.dh);
-    if (e.shiftKey || o0.type === 'text') sx = sy = Math.max(sx, sy);
-    const mx = v => ax + (v-ax)*sx, my = v => ay + (v-ay)*sy;
-    if (o0.points) obj.points = o0.points.map(p => ({...p, x:mx(p.x), y:my(p.y)}));
-    else if (o0.type === 'text'){ obj.fontSize = Math.max(6, Math.round(o0.fontSize*sy)); obj.x = mx(o0.x); obj.y = my(o0.y); }
-    else if (o0.x2 !== undefined){ obj.x = mx(o0.x); obj.y = my(o0.y); obj.x2 = mx(o0.x2); obj.y2 = my(o0.y2); }
-    else {
-      const x0 = mx(o0.x), x1 = mx(o0.x+o0.w), y0 = my(o0.y), y1 = my(o0.y+o0.h);
-      obj.x = Math.min(x0,x1); obj.w = Math.abs(x1-x0); obj.y = Math.min(y0,y1); obj.h = Math.abs(y1-y0);
-    }
-    redrawOverlay();
-  });
-  window.addEventListener('pointerup', () => {
-    if (rs){ rs = null; commitHistory(); buildLeftPanel(); }
-    pan = null;
-  });
-
-  /* ---------- Cursor coordinates ---------- */
-  const coords = document.createElement('span'); coords.id = 'coords';
-  $('#status-info').after(coords);
-  overlayCanvas.addEventListener('pointermove', e => {
-    const p = canvasPoint(e); coords.textContent = `X ${Math.round(p.x)}  Y ${Math.round(p.y)}`;
-  });
-  overlayCanvas.addEventListener('pointerleave', () => coords.textContent = '');
-
-  /* ---------- Zoom: fit, Ctrl+wheel, Space-pan ---------- */
-  let spaceDown = false, pan = null, fitKey = '';
-  function fitZoom(){
-    const pg = state.pages[state.currentPage]; if (!pg) return;
-    const w = $('#stage-wrap');
-    state.zoom = Math.max(.1, Math.min(1, (w.clientWidth-80)/pg.width, (w.clientHeight-80)/pg.height));
-    applyZoomStyle(); updateStatus();
-  }
-  const _rcp = renderCurrentPage;
-  renderCurrentPage = function(){
-    _rcp();
-    const pg = state.pages[state.currentPage]; if (!pg) return;
-    const k = `${state.projectId}:${state.currentPage}:${pg.width}x${pg.height}`;
-    if (k !== fitKey){ fitKey = k; fitZoom(); }
-  };
-  $('#menu-zoomfit').onclick = fitZoom;
-  $('#menu-zoomfit').firstChild.textContent = 'Fit to screen';
-  $('#stage-wrap').addEventListener('wheel', e => {
-    if (!(e.ctrlKey || e.metaKey)) return;
-    e.preventDefault();
-    state.zoom = Math.max(.1, Math.min(4, state.zoom * Math.exp(-e.deltaY * .002)));
-    applyZoomStyle(); updateStatus();
-  }, {passive:false});
-
-  window.addEventListener('keydown', e => {
-    if (isTypingTarget(e.target)) return;
-    const mod = e.ctrlKey || e.metaKey, obj = getSelectedObject();
-    if (e.code === 'Space' && !spaceDown){ spaceDown = true; $('#stage-wrap').classList.add('panning'); e.preventDefault(); return; }
-    if (mod && e.key === '0'){ e.preventDefault(); fitZoom(); return; }
-    if (!obj) return;
-    if (mod && e.key.toLowerCase() === 'd'){ e.preventDefault(); duplicateObject(obj); return; }
-    if (mod && e.key === ']'){ e.preventDefault(); arrange(obj, e.shiftKey ? 'front' : 1); return; }
-    if (mod && e.key === '['){ e.preventDefault(); arrange(obj, e.shiftKey ? 'back' : -1); return; }
-    const d = {ArrowLeft:[-1,0], ArrowRight:[1,0], ArrowUp:[0,-1], ArrowDown:[0,1]}[e.key];
-    if (d && state.tool === 'select'){
-      e.preventDefault();
-      const s = e.shiftKey ? 10 : 1, dx = d[0]*s, dy = d[1]*s;
-      if (obj.points) obj.points = obj.points.map(p => ({...p, x:p.x+dx, y:p.y+dy}));
-      else { obj.x += dx; obj.y += dy; if (obj.x2 !== undefined){ obj.x2 += dx; obj.y2 += dy; } }
-      redrawOverlay(); scheduleSave();
-    }
-  });
-  window.addEventListener('keyup', e => {
-    if (e.code === 'Space'){ spaceDown = false; $('#stage-wrap').classList.remove('panning'); }
-  });
-
-  /* ---------- Layers tab ---------- */
-  const tabs = document.querySelector('.tabs');
-  const tb = document.createElement('button');
-  tb.className = 'tab-btn'; tb.dataset.tab = 'layers'; tb.textContent = 'Layers';
-  tabs.insertBefore(tb, tabs.children[1]);
-  const lp = document.createElement('div');
-  lp.className = 'tab-panel'; lp.id = 'tab-layers';
-  $('#tab-pages').after(lp);
-  tb.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    tb.classList.add('active'); lp.classList.add('active'); refreshLayers(true);
-  });
-  const eye = off => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>${off ? '<path d="M3 3l18 18"/>' : ''}</svg>`;
-  const NAMES = {path:'Pencil', highlight:'Highlight', underline:'Underline', strike:'Strikethrough', rect:'Rectangle', ellipse:'Ellipse', line:'Line', arrow:'Arrow', text:'Text', image:'Image', note:'Note'};
-  let layersSig = '';
-  function refreshLayers(force){
-    const pg = state.pages[state.currentPage];
-    const objs = pg ? pg.objects : [];
-    const sig = objs.map(o => o.id + (o.hidden ? 'h' : '') + (o.text || '')).join('|') + state.selectedObjectId + state.currentPage;
-    if (!force && sig === layersSig) return;
-    layersSig = sig;
-    if (!objs.length){ lp.innerHTML = '<p class="hint">No layers yet. Anything you draw or type on this page is listed here, top-most first.</p>'; return; }
-    lp.innerHTML = objs.slice().reverse().map(o => {
-      const label = o.type === 'text' ? (o.text || 'Text').slice(0, 22) : (NAMES[o.type] || o.type) + (o.type === 'note' ? ' ' + o.noteNum : '');
-      return `<div class="layer-row ${o.id === state.selectedObjectId ? 'active' : ''} ${o.hidden ? 'hidden-layer' : ''}" data-id="${o.id}">
-        <button class="icon-btn" data-l="eye" title="Show / hide">${eye(o.hidden)}</button>
-        <span class="layer-chip" style="background:${o.color || '#888'}"></span>
-        <span class="layer-name">${escapeHtml(label)}</span>
-        <button class="icon-btn" data-l="up" title="Bring forward">${svgIcon('up')}</button>
-        <button class="icon-btn" data-l="down" title="Send backward">${svgIcon('down')}</button>
-        <button class="icon-btn" data-l="del" title="Delete">${svgIcon('trash')}</button></div>`;
-    }).join('');
-    lp.querySelectorAll('.layer-row').forEach(row => {
-      const obj = pg.objects.find(o => o.id === row.dataset.id);
-      row.addEventListener('click', e => {
-        const act = e.target.closest('[data-l]')?.dataset.l;
-        if (act === 'eye'){ obj.hidden = !obj.hidden; if (obj.hidden && state.selectedObjectId === obj.id) state.selectedObjectId = null; commitHistory(); redrawOverlay(); refreshLayers(true); return; }
-        if (act === 'up') return arrange(obj, 1);
-        if (act === 'down') return arrange(obj, -1);
-        if (act === 'del'){ pg.objects = pg.objects.filter(o => o !== obj); if (state.selectedObjectId === obj.id) state.selectedObjectId = null; commitHistory(); buildLeftPanel(); redrawOverlay(); buildNotesTab(); refreshLayers(true); return; }
-        if (state.tool !== 'select') setTool('select');
-        state.selectedObjectId = obj.id; buildLeftPanel(); syncMenuState(); redrawOverlay();
-      });
-    });
-  }
-  const _ro = redrawOverlay;
-  redrawOverlay = function(){ _ro(); if (lp.classList.contains('active')) refreshLayers(); };
-  refreshLayers(true);
-})();
 </script>
 </body>
 </html>
