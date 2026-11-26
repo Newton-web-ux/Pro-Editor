@@ -198,6 +198,26 @@ body.sb-collapsed #sidebar{margin-left:-256px}
 </head>
 <body>
 
+<div id="bootErr" hidden style="position:fixed;inset:0;z-index:999;display:grid;place-items:center;padding:24px;background:#f6f8fc;color:#1f2328;font-family:system-ui,sans-serif"><div style="max-width:560px"><h2 style="margin:0 0 8px">Pro Mail could not start</h2><p id="bootMsg" style="margin:0 0 12px;line-height:1.5"></p><p style="margin:0;color:#5f6b7a;font-size:13px">Open the browser console (F12) for details, then check the setup steps in the README.</p></div></div>
+<noscript><p style="padding:24px;font-family:system-ui,sans-serif">Pro Mail needs JavaScript enabled.</p></noscript>
+<script>
+(function () {
+  function show(msg) {
+    var b = document.getElementById('bootErr'); if (!b) return;
+    document.getElementById('bootMsg').textContent = msg; b.hidden = false;
+  }
+  window.addEventListener('error', function (e) {
+    var t = e.target;
+    show(t && (t.src || t.href) ? 'Failed to load: ' + (t.src || t.href) : (e.message || 'Unexpected error.'));
+  }, true);
+  window.addEventListener('unhandledrejection', function (e) { show('Startup error: ' + (e.reason && e.reason.message || e.reason)); });
+  setTimeout(function () {
+    var a = document.getElementById('auth'), p = document.getElementById('app');
+    if (a && p && a.hidden && p.hidden) show('The app did not finish loading. Check your internet connection and the Firebase settings in index.html.');
+  }, 8000);
+})();
+</script>
+
 <div id="auth" class="auth" hidden>
   <div class="auth-card">
     <div class="brand"><div class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>Pro Mail</div>
@@ -240,7 +260,7 @@ import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWith
 import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, orderBy, limit, onSnapshot, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 /* ============================ CONFIG ============================ */
-const firebaseConfig = {
+const FIREBASE_CONFIG = {
   apiKey: "AIzaSyAxV-h9ugxGq9LyQmg6nUutqOjDFP_bGmk",
   authDomain: "pro-mail-2941d.firebaseapp.com",
   projectId: "pro-mail-2941d",
