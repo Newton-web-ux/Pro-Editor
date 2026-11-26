@@ -1,2525 +1,1106 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pro Editor — PDF · PPT · PNG</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pro Mail</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#181819;
-    --panel:#242427;
-    --panel-2:#2b2b2f;
-    --panel-3:#333338;
-    --border:#3c3c41;
-    --border-soft:#333337;
-    --text:#e7e7e9;
-    --text-dim:#9a9aa1;
-    --text-faint:#68686e;
-    --accent:#4fd1b8;
-    --accent-strong:#5ee0c1;
-    --accent-dim:#294742;
-    --accent-soft:rgba(79,209,184,0.12);
-    --danger:#e2645d;
-    --radius:4px;
-    --radius-lg:6px;
-  }
-  *{box-sizing:border-box;}
-  html,body{height:100%;}
-  body{
-    margin:0;
-    background:var(--bg);
-    color:var(--text);
-    font-family:'DM Sans',sans-serif;
-    overflow:hidden;
-    -webkit-font-smoothing:antialiased;
-    font-size:13px;
-  }
-  h1,h2,h3{font-family:'Syne',sans-serif;}
-  .brand{font-family:'Syne',sans-serif;}
-  .mono{font-family:'DM Mono',monospace;}
-  button{font-family:inherit;touch-action:manipulation;}
-  ::selection{background:var(--accent-soft);}
+:root{--bg:#f6f8fc;--surface:#fff;--surface2:#eaf1fb;--text:#1f2328;--muted:#5f6b7a;--line:#e3e8ef;--accent:#0b57d0;--accent-bg:#d3e3fd;--accent-ink:#fff;--danger:#c5221f;--read:#f2f6fc;--shadow:0 1px 3px rgba(16,24,40,.12),0 8px 24px rgba(16,24,40,.12);--radius:14px;--row-h:44px}
+[data-theme=dark]{--bg:#0f1318;--surface:#171c23;--surface2:#222a35;--text:#e7eaee;--muted:#98a2b0;--line:#2a323d;--accent:#8ab4f8;--accent-bg:#27405f;--accent-ink:#0b1320;--danger:#f28b82;--read:#12171d;--shadow:0 1px 3px rgba(0,0,0,.5),0 8px 28px rgba(0,0,0,.5)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font-family:'DM Sans',system-ui,sans-serif;font-size:14px;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased}
+body.compact{--row-h:34px}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+input,textarea,select{font:inherit;color:inherit}
+[hidden]{display:none!important}
+.ic{display:block;flex:none}
+.icon-btn{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:var(--muted);transition:background .15s}
+.icon-btn:hover{background:var(--surface2);color:var(--text)}
+.icon-btn.sm{width:30px;height:30px}
+.icon-btn.on{color:#e8a200}
+.btn{height:38px;padding:0 18px;border-radius:19px;font-weight:600;border:1px solid var(--line);background:var(--surface)}
+.btn:hover{background:var(--surface2)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.danger{color:var(--danger)}
+.btn:disabled{opacity:.55;cursor:default}
+.linkbtn{color:var(--muted);font-size:13px;padding:2px 6px;border-radius:6px}
+.linkbtn:hover{background:var(--surface2);color:var(--text)}
+.brand{font-family:Syne,sans-serif;font-weight:800;letter-spacing:-.02em}
+.mono{font-family:'DM Mono',monospace}
 
-  /* ---------- View switching ---------- */
-  body.view-dashboard #app{display:none;}
-  body.view-editor #dashboard-view{display:none;}
+/* auth */
+.auth{min-height:100%;display:grid;place-items:center;padding:24px;background:radial-gradient(1200px 600px at 20% -10%,var(--accent-bg),transparent),var(--bg)}
+.auth-card{width:min(420px,100%);background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:34px 32px;box-shadow:var(--shadow)}
+.auth-card .brand{font-size:28px;display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#7a5af8);display:grid;place-items:center;color:#fff}
+.auth-card p.sub{margin:0 0 22px;color:var(--muted)}
+.tabs{display:flex;background:var(--surface2);border-radius:12px;padding:4px;margin-bottom:18px}
+.tabs button{flex:1;height:34px;border-radius:9px;font-weight:600;color:var(--muted)}
+.tabs button.on{background:var(--surface);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.fld{display:block;margin-bottom:14px}
+.fld span{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px}
+.fld input,.fld textarea,.fld select{width:100%;height:42px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);outline:none}
+.fld textarea{height:100px;padding:10px 12px;resize:vertical}
+.fld input:focus,.fld textarea:focus,.fld select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}
+.suffix{display:flex;align-items:center;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.suffix:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}
+.suffix input{border:0!important;box-shadow:none!important;flex:1;min-width:0}
+.suffix em{font-style:normal;color:var(--muted);padding-right:12px;font-size:13px}
+.err{color:var(--danger);font-size:13px;min-height:18px;margin:2px 0 10px}
+.auth-card .btn.primary{width:100%;height:44px;border-radius:12px}
+.banner{background:#fff4d6;color:#6b4e00;border:1px solid #f2d98b;border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:14px}
 
-  #app{
-    display:grid;
-    grid-template-rows:30px 46px 34px 1fr 26px;
-    height:100vh;
-  }
+/* shell */
+#app{height:100%;display:flex;flex-direction:column}
+.topbar{height:64px;display:flex;align-items:center;gap:8px;padding:0 14px 0 10px;flex:none}
+.top-brand{display:flex;align-items:center;gap:10px;width:236px;font-size:21px}
+.search{flex:1;max-width:720px;height:46px;border-radius:24px;background:var(--surface2);display:flex;align-items:center;padding:0 6px 0 14px;gap:8px;color:var(--muted);transition:background .15s,box-shadow .15s}
+.search:focus-within{background:var(--surface);box-shadow:var(--shadow)}
+.search input{flex:1;border:0;background:none;outline:none;height:100%;color:var(--text)}
+.top-actions{margin-left:auto;display:flex;align-items:center;gap:2px}
+.avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:14px;flex:none;text-transform:uppercase}
+.layout{flex:1;display:flex;min-height:0}
+#sidebar{width:256px;flex:none;padding:6px 12px 12px 8px;overflow:auto;transition:margin .2s}
+body.sb-collapsed #sidebar{margin-left:-256px}
+.compose-btn{height:54px;padding:0 24px 0 16px;border-radius:16px;background:var(--accent-bg);color:var(--text);font-weight:600;display:flex;align-items:center;gap:12px;margin:6px 0 16px;box-shadow:0 1px 2px rgba(0,0,0,.1)}
+.compose-btn:hover{box-shadow:var(--shadow)}
+.nav{display:flex;align-items:center;gap:14px;width:100%;height:34px;padding:0 14px 0 20px;border-radius:0 17px 17px 0;color:var(--text);text-align:left;margin-left:-8px;padding-left:28px}
+.nav:hover{background:var(--surface2)}
+.nav.on{background:var(--accent-bg);font-weight:700}
+.nav .n{margin-left:auto;font-size:12px;font-weight:700}
+.nav .dot{width:12px;height:12px;border-radius:50%;flex:none;margin:0 3px}
+.side-h{display:flex;align-items:center;justify-content:space-between;margin:18px 0 4px 20px;font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.nav .x{opacity:0;margin-left:auto;color:var(--muted)}
+.nav:hover .x{opacity:1}
+.nav:hover .x+.n{display:none}
+#main{flex:1;min-width:0;margin:0 14px 14px 0;background:var(--surface);border-radius:var(--radius);display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--line)}
+.toolbar{height:48px;display:flex;align-items:center;gap:2px;padding:0 10px;border-bottom:1px solid var(--line);flex:none}
+.toolbar .sp{flex:1}
+.toolbar .info{color:var(--muted);font-size:12px;padding:0 8px}
+.chk{width:18px;height:18px;accent-color:var(--accent);cursor:pointer}
+.list-scroll{flex:1;overflow:auto}
+.row{display:flex;align-items:center;gap:10px;height:var(--row-h);padding:0 14px 0 12px;border-bottom:1px solid var(--line);cursor:pointer;background:var(--read);position:relative}
+.row.unread{background:var(--surface);font-weight:700}
+.row:hover{box-shadow:inset 1px 0 0 var(--accent-bg),0 1px 3px rgba(16,24,40,.14);z-index:1}
+.row.sel{background:var(--accent-bg)}
+.row.cur{outline:2px solid var(--accent);outline-offset:-2px}
+.row .who{width:200px;flex:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .cnt{font-weight:500;color:var(--muted);font-size:12px;margin-left:4px}
+.row .mid{flex:1;min-width:0;display:flex;gap:8px;align-items:center;white-space:nowrap;overflow:hidden}
+.row .subj{flex:none;max-width:60%;overflow:hidden;text-overflow:ellipsis}
+.row .snip{color:var(--muted);font-weight:400;overflow:hidden;text-overflow:ellipsis}
+.row .when{flex:none;font-size:12px;color:var(--muted);min-width:56px;text-align:right}
+.row.unread .when{color:var(--text)}
+.star{color:var(--muted);width:30px;height:30px;display:grid;place-items:center;border-radius:50%;flex:none}
+.star:hover{background:var(--surface2)}
+.star.on{color:#e8a200}
+.star.on svg{fill:#e8a200}
+.draft-tag{color:var(--danger)}
+.lbl{display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:6px;font-size:11px;font-weight:600;color:#fff;flex:none}
+.clip{color:var(--muted);flex:none}
+.empty{display:grid;place-items:center;height:100%;color:var(--muted);text-align:center;padding:40px}
+.empty .big{width:72px;height:72px;border-radius:50%;background:var(--surface2);display:grid;place-items:center;margin:0 auto 14px}
+.list-foot{padding:14px;text-align:center;color:var(--muted)}
 
-  /* ---------- Menu bar ---------- */
-  #menubar{
-    display:flex;align-items:center;gap:2px;
-    background:#161617;border-bottom:1px solid var(--border-soft);
-    padding:0 10px;position:relative;z-index:40;
-  }
-  .menu-item{position:relative;}
-  .menu-item > .menu-label{
-    background:none;border:none;color:var(--text-dim);font-size:11.5px;font-weight:500;
-    padding:6px 10px;cursor:pointer;border-radius:3px;letter-spacing:.01em;
-  }
-  .menu-item:hover > .menu-label, .menu-item.open > .menu-label{background:var(--panel-2);color:var(--text);}
-  .menu-dropdown{
-    display:none;position:absolute;top:100%;left:0;min-width:210px;
-    background:#232326;border:1px solid var(--border);border-radius:var(--radius-lg);
-    box-shadow:0 12px 30px #000000a0;padding:5px;margin-top:4px;
-  }
-  .menu-item.open .menu-dropdown{display:block;}
-  .menu-opt{
-    display:flex;align-items:center;justify-content:space-between;gap:20px;
-    padding:7px 10px;border-radius:3px;color:var(--text);font-size:12.5px;cursor:pointer;
-    background:none;border:none;width:100%;text-align:left;
-  }
-  .menu-opt:hover{background:var(--accent-soft);color:var(--accent-strong);}
-  .menu-opt:disabled{opacity:.35;cursor:default;}
-  .menu-opt:disabled:hover{background:none;color:var(--text);}
-  .menu-opt .kbd{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--text-faint);}
-  .menu-divider{height:1px;background:var(--border-soft);margin:5px 3px;}
-  #menubar .brand-mini{
-    display:flex;align-items:center;gap:7px;margin-right:10px;padding-right:10px;
-    border-right:1px solid var(--border-soft);
-  }
-  #menubar .brand-mini .mark{
-    width:16px;height:16px;border-radius:4px;background:linear-gradient(135deg,var(--accent),#2a8f7d);
-    display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#0c1614;
-  }
-  #menubar .brand-mini span{font-size:11.5px;font-weight:700;color:var(--text-dim);font-family:'Syne',sans-serif;}
+/* reader */
+.reader{flex:1;overflow:auto;padding:18px 28px 40px}
+.r-subject{font-size:22px;font-weight:500;margin:6px 0 10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.msg{border:1px solid var(--line);border-radius:12px;margin:12px 0;background:var(--surface)}
+.msg-head{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer}
+.msg-head .meta{flex:1;min-width:0}
+.msg-head .nm{font-weight:700}
+.msg-head .ad{color:var(--muted);font-size:12px;margin-left:6px}
+.msg-head .to{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.msg-head .tm{color:var(--muted);font-size:12px;flex:none}
+.msg:not(.open) .msg-body,.msg:not(.open) .msg-atts,.msg:not(.open) .msg-act{display:none}
+.msg:not(.open) .to{display:none}
+.msg:not(.open) .snip-line{display:block}
+.snip-line{display:none;color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.msg-body{padding:4px 16px 16px 62px;line-height:1.6;overflow-wrap:anywhere}
+.msg-body a,.editor a{color:var(--accent)}
+.msg-body blockquote,.editor blockquote{margin:8px 0;padding-left:12px;border-left:3px solid var(--line);color:var(--muted)}
+.msg-body pre{background:var(--surface2);padding:10px;border-radius:8px;overflow:auto}
+.msg-body table{border-collapse:collapse}
+.msg-body td,.msg-body th{border:1px solid var(--line);padding:4px 8px}
+.msg-atts{display:flex;flex-wrap:wrap;gap:8px;padding:0 16px 14px 62px}
+.att{display:inline-flex;align-items:center;gap:8px;max-width:260px;height:38px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--text);text-decoration:none;font-size:13px}
+.att:hover{background:var(--surface2)}
+.att span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.att small{color:var(--muted);flex:none}
+.msg-act{display:flex;gap:8px;padding:0 16px 16px 62px}
+.tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;background:var(--surface2);color:var(--muted)}
+.tag.bad{background:#fde7e7;color:var(--danger)}
 
-  /* ---------- Topbar ---------- */
-  #topbar{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    padding:0 14px;
-    background:var(--panel);
-    border-bottom:1px solid var(--border-soft);
-    z-index:20;
-  }
-  .brand{
-    font-weight:700;
-    font-size:14px;
-    letter-spacing:0.01em;
-    color:var(--text);
-    display:flex;
-    align-items:center;
-    gap:8px;
-    margin-right:4px;
-  }
-  .brand .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);}
-  .badge{
-    font-family:'DM Mono',monospace;
-    font-size:9.5px;
-    padding:3px 7px;
-    border-radius:3px;
-    background:var(--panel-3);
-    border:1px solid var(--border);
-    color:var(--text-dim);
-    text-transform:uppercase;
-    letter-spacing:0.06em;
-  }
-  .topbar-sep{width:1px;height:22px;background:var(--border);margin:0 2px;}
-  .tb-btn{
-    display:flex;align-items:center;gap:6px;
-    background:transparent;border:1px solid transparent;color:var(--text-dim);
-    padding:6px 10px;border-radius:var(--radius);cursor:pointer;font-size:12.5px;font-weight:500;
-    transition:background .1s ease,color .1s ease;
-  }
-  .tb-btn:hover{background:var(--panel-3);color:var(--text);}
-  .tb-btn:disabled{opacity:.35;cursor:not-allowed;}
-  .tb-btn:disabled:hover{background:transparent;color:var(--text-dim);}
-  .tb-btn.primary{
-    background:var(--accent);color:#0a1917;font-weight:700;border-color:var(--accent);
-  }
-  .tb-btn.primary:hover{background:var(--accent-strong);}
-  .tb-btn.icononly{padding:6px;width:30px;justify-content:center;}
-  .tb-btn.icononly svg{width:15px;height:15px;}
-  #topbar .spacer{flex:1;}
-  #filename{
-    font-size:11.5px;color:var(--text-faint);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-    font-family:'DM Mono',monospace;
-  }
+/* compose */
+#composeDock{position:fixed;right:20px;bottom:0;display:flex;flex-direction:row-reverse;align-items:flex-end;gap:14px;z-index:30;pointer-events:none}
+.compose{pointer-events:auto;width:540px;max-width:calc(100vw - 24px);background:var(--surface);border:1px solid var(--line);border-bottom:0;border-radius:14px 14px 0 0;box-shadow:var(--shadow);display:flex;flex-direction:column;max-height:calc(100vh - 90px);height:560px}
+.compose.min{height:auto}
+.compose.min .c-main{display:none}
+.compose.max{position:fixed;inset:6vh 8vw;width:auto;max-width:none;height:auto;max-height:none;border-radius:14px;border-bottom:1px solid var(--line);z-index:60}
+.c-head{display:flex;align-items:center;gap:2px;padding:6px 8px 6px 16px;background:var(--surface2);border-radius:14px 14px 0 0;cursor:pointer;font-weight:600}
+.c-title{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.c-main{display:flex;flex-direction:column;flex:1;min-height:0}
+.c-row{display:flex;align-items:flex-start;gap:8px;padding:5px 14px;border-bottom:1px solid var(--line)}
+.c-row>label{color:var(--muted);width:34px;padding-top:6px;flex:none}
+.field{flex:1;display:flex;flex-wrap:wrap;gap:4px;align-items:center;min-width:0}
+.field input{flex:1;min-width:120px;border:0;outline:none;background:none;height:30px}
+.field input.bad{color:var(--danger)}
+.chip{display:inline-flex;align-items:center;gap:4px;height:26px;padding:0 4px 0 10px;border-radius:13px;background:var(--surface2);font-size:13px}
+.chip button{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;color:var(--muted)}
+.chip button:hover{background:var(--line)}
+.c-subject{border:0;border-bottom:1px solid var(--line);padding:10px 14px;outline:none;background:none}
+.fmt{display:flex;gap:2px;padding:4px 10px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.fmt button{min-width:30px;height:28px;border-radius:6px;color:var(--muted);font-weight:700;display:grid;place-items:center;padding:0 6px}
+.fmt button:hover{background:var(--surface2);color:var(--text)}
+.editor{flex:1;overflow:auto;padding:12px 16px;outline:none;line-height:1.55;min-height:120px}
+.c-atts{display:flex;flex-wrap:wrap;gap:8px;padding:0 14px 8px}
+.c-atts:empty{display:none}
+.c-atts .att button{color:var(--muted);margin-left:2px}
+.c-foot{display:flex;align-items:center;gap:6px;padding:10px 12px;border-top:1px solid var(--line)}
+.c-foot .grow{flex:1;color:var(--muted);font-size:12px}
+.spin{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--accent);animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
 
-  /* ---------- Options bar (contextual, per-tool) ---------- */
-  #optionsbar{
-    display:flex;align-items:center;gap:6px;padding:0 14px;
-    background:var(--panel);border-bottom:1px solid var(--border-soft);
-    font-size:12px;color:var(--text-dim);overflow-x:auto;white-space:nowrap;
-  }
-  #optionsbar .ob-toolname{font-weight:700;color:var(--text);font-size:12px;margin-right:4px;}
-  #optionsbar .ob-kbd{
-    font-family:'DM Mono',monospace;font-size:10px;color:var(--text-faint);
-    border:1px solid var(--border);border-radius:3px;padding:1px 5px;margin-right:10px;
-  }
-  #optionsbar .ob-sep{width:1px;height:18px;background:var(--border);margin:0 8px;}
-  #optionsbar .ob-swatch{
-    width:16px;height:16px;border-radius:3px;border:1px solid var(--border);cursor:pointer;flex-shrink:0;
-  }
-  #optionsbar .ob-swatch.selected{outline:1.5px solid var(--accent);outline-offset:1px;}
-  #optionsbar .ob-group{display:flex;align-items:center;gap:6px;}
-  #optionsbar .ob-nav-btn{
-    background:transparent;border:1px solid var(--border);color:var(--text-dim);
-    width:22px;height:22px;border-radius:3px;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  }
-  #optionsbar .ob-nav-btn:hover{color:var(--text);border-color:var(--text-dim);}
-  #optionsbar .ob-page-indicator{font-family:'DM Mono',monospace;font-size:11px;color:var(--text-dim);min-width:64px;text-align:center;}
+/* overlays */
+#overlay .wrap{position:fixed;inset:0;background:rgba(10,14,20,.45);display:grid;place-items:center;z-index:80;padding:16px}
+.modal{width:min(440px,100%);background:var(--surface);border-radius:18px;padding:24px;box-shadow:var(--shadow);max-height:90vh;overflow:auto}
+.modal h2{margin:0 0 14px;font-size:18px}
+.modal .acts{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.modal p{color:var(--muted);margin:0}
+.popover{position:fixed;z-index:90;min-width:200px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:6px}
+.popover button{display:flex;align-items:center;gap:10px;width:100%;height:36px;padding:0 12px;border-radius:8px;text-align:left}
+.popover button:hover{background:var(--surface2)}
+.popover .sep{height:1px;background:var(--line);margin:6px 0}
+.popover .hd{padding:8px 12px;color:var(--muted);font-size:12px}
+#toasts{position:fixed;left:20px;bottom:20px;display:flex;flex-direction:column;gap:8px;z-index:100}
+.toast{display:flex;align-items:center;gap:16px;background:#202124;color:#fff;padding:12px 16px;border-radius:10px;box-shadow:var(--shadow);max-width:420px;animation:in .2s ease}
+.toast.error{background:#8c1d18}
+.toast button{color:#8ab4f8;font-weight:700}
+@keyframes in{from{transform:translateY(8px);opacity:0}}
 
-  /* ---------- Body layout ---------- */
-  #body{
-    display:grid;
-    grid-template-columns:64px 260px 1fr 260px;
-    min-height:0;
-  }
-
-  /* Tool rail */
-  #toolrail{
-    background:var(--panel);
-    border-right:1px solid var(--border-soft);
-    display:flex;flex-direction:column;align-items:center;
-    padding:10px 13px;gap:3px;overflow-y:auto;
-  }
-  .tool-btn{
-    width:38px;height:34px;border-radius:var(--radius);
-    background:transparent;border:1px solid transparent;color:var(--text-dim);
-    display:flex;align-items:center;justify-content:center;cursor:pointer;
-    transition:background .1s ease,color .1s ease;position:relative;
-  }
-  .tool-btn svg{width:17px;height:17px;}
-  .tool-btn:hover{background:var(--panel-3);color:var(--text);}
-  .tool-btn.active{background:var(--accent-dim);color:var(--accent-strong);}
-  .tool-btn.active::before{
-    content:'';position:absolute;left:-10px;top:50%;transform:translateY(-50%);
-    width:3px;height:16px;border-radius:2px;background:var(--accent);
-  }
-  .tool-sep{width:24px;height:1px;background:var(--border-soft);margin:5px 0;}
-
-  /* Left panel: properties */
-  #left-panel{
-    background:var(--panel);
-    border-right:1px solid var(--border-soft);
-    padding:14px;overflow-y:auto;
-  }
-  .panel-title{
-    font-size:10.5px;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-faint);
-    margin:0 0 12px 0;font-weight:700;font-family:'DM Sans',sans-serif;
-    display:flex;align-items:center;gap:6px;
-  }
-  .panel-title::after{content:'';flex:1;height:1px;background:var(--border-soft);}
-  .field{margin-bottom:14px;}
-  .field label{
-    display:block;font-size:10.5px;color:var(--text-dim);margin-bottom:7px;font-weight:600;
-    text-transform:uppercase;letter-spacing:.03em;
-  }
-  .swatches{display:flex;flex-wrap:wrap;gap:6px;}
-  .swatch{
-    width:19px;height:19px;border-radius:4px;cursor:pointer;border:1px solid #ffffff22;
-    transition:transform .1s ease;
-  }
-  .swatch:hover{transform:scale(1.1);}
-  .swatch.selected{outline:1.5px solid var(--accent);outline-offset:2px;border-color:transparent;}
-  input[type=range]{
-    width:100%;accent-color:var(--accent);height:3px;
-  }
-  input[type=color]{
-    width:30px;height:24px;border:1px solid var(--border);border-radius:4px;background:none;padding:0;cursor:pointer;
-  }
-  .range-row{display:flex;align-items:center;gap:10px;}
-  .range-val{font-family:'DM Mono',monospace;font-size:11px;color:var(--text-dim);min-width:28px;text-align:right;}
-  select, .text-input{
-    width:100%;background:var(--panel-3);border:1px solid var(--border);color:var(--text);
-    padding:6px 8px;border-radius:4px;font-size:12.5px;font-family:inherit;
-  }
-  .hint{font-size:11.5px;color:var(--text-faint);line-height:1.55;margin-top:8px;}
-  .btn-row{display:flex;gap:7px;}
-  .btn-sm{
-    flex:1;background:var(--panel-3);border:1px solid var(--border);color:var(--text);
-    padding:7px;border-radius:4px;font-size:11.5px;cursor:pointer;font-weight:600;
-    transition:border-color .1s ease,color .1s ease;
-  }
-  .btn-sm:hover{border-color:var(--accent);color:var(--accent-strong);}
-
-  /* Stage */
-  #stage-wrap{
-    position:relative;background:#0f0f10;
-    background-image:
-      linear-gradient(#232326 1px, transparent 1px),
-      linear-gradient(90deg, #232326 1px, transparent 1px);
-    background-size:24px 24px;
-    background-position:-1px -1px;
-    display:flex;align-items:center;justify-content:center;overflow:auto;
-  }
-  #empty-state{
-    text-align:center;color:var(--text-faint);
-  }
-  #empty-state h2{color:var(--text-dim);font-size:18px;margin-bottom:7px;font-weight:700;font-family:'Syne',sans-serif;}
-  #empty-state p{font-size:12.5px;margin-bottom:20px;font-family:'DM Mono',monospace;letter-spacing:.02em;}
-  #drop-zone{
-    border:1.5px dashed var(--border);background:#1c1c1e;
-    border-radius:8px;padding:46px 60px;cursor:pointer;transition:all .15s ease;
-  }
-  #drop-zone:hover, #drop-zone.dragover{border-color:var(--accent);background:var(--accent-soft);}
-  #canvas-holder{
-    position:relative;box-shadow:0 1px 0 #ffffff14, 0 24px 60px #000000b0;display:none;
-  }
-  #base-canvas, #overlay-canvas{
-    position:absolute;top:0;left:0;
-  }
-  #overlay-canvas{cursor:crosshair;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
-  #canvas-holder{touch-action:none;}
-  #stage-wrap{touch-action:pan-x pan-y;}
-
-  /* Larger touch targets for finger/stylus use on coarse-pointer (touch) devices,
-     without changing the compact desktop mouse layout. */
-  @media (any-pointer: coarse){
-    #toolrail{padding:10px 10px;gap:6px;}
-    .tool-btn{width:44px;height:44px;}
-    .tool-btn svg{width:19px;height:19px;}
-    .icon-btn{width:26px;height:26px;}
-    .icon-btn svg{width:13px;height:13px;}
-    #optionsbar .ob-swatch{width:22px;height:22px;}
-    #optionsbar .ob-nav-btn{width:28px;height:28px;}
-    .swatch{width:24px;height:24px;}
-    .tb-btn{padding:8px 12px;}
-    .zoom-controls button{width:26px;height:26px;font-size:16px;}
-  }
-
-  /* Right panel */
-  #right-panel{
-    background:var(--panel);border-left:1px solid var(--border-soft);
-    display:flex;flex-direction:column;min-height:0;
-  }
-  .tabs{display:flex;border-bottom:1px solid var(--border-soft);background:#1f1f22;}
-  .tab-btn{
-    flex:1;background:transparent;border:none;color:var(--text-faint);padding:10px 0;
-    font-size:10.5px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;
-    border-bottom:2px solid transparent;transition:color .1s ease;
-  }
-  .tab-btn:hover{color:var(--text-dim);}
-  .tab-btn.active{color:var(--accent-strong);border-color:var(--accent);}
-  .tab-panel{display:none;flex:1;overflow-y:auto;padding:10px;}
-  .tab-panel.active{display:block;}
-
-  .page-card{
-    display:flex;align-items:center;gap:8px;
-    background:var(--panel-2);border:1px solid var(--border-soft);border-radius:5px;
-    padding:6px;margin-bottom:6px;cursor:pointer;transition:border-color .1s ease,background .1s ease;
-  }
-  .page-card:hover{border-color:#4a4a50;}
-  .page-card.active{border-color:var(--accent);background:var(--accent-soft);}
-  .page-thumb{
-    width:40px;height:52px;background:#fff;border-radius:2px;overflow:hidden;flex-shrink:0;
-    display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px #0006;
-  }
-  .page-thumb img{width:100%;height:100%;object-fit:contain;}
-  .page-meta{flex:1;min-width:0;}
-  .page-meta .pnum{font-size:11.5px;font-weight:600;color:var(--text);}
-  .page-meta .pdesc{font-size:10px;color:var(--text-faint);font-family:'DM Mono',monospace;}
-  .page-actions{display:flex;flex-direction:column;gap:2px;}
-  .icon-btn{
-    width:20px;height:20px;background:transparent;border:none;color:var(--text-faint);
-    cursor:pointer;border-radius:3px;display:flex;align-items:center;justify-content:center;
-  }
-  .icon-btn:hover{color:var(--text);background:var(--panel-3);}
-  .icon-btn svg{width:11px;height:11px;}
-
-  .textrun-card{
-    background:var(--panel-2);border:1px solid var(--border-soft);border-radius:5px;padding:8px;margin-bottom:7px;
-  }
-  .textrun-card textarea{
-    width:100%;background:var(--bg);border:1px solid var(--border-soft);color:var(--text);
-    border-radius:4px;padding:7px;font-size:12px;font-family:'DM Sans',sans-serif;resize:vertical;min-height:40px;
-  }
-  .textrun-card textarea:focus{outline:none;border-color:var(--accent);}
-  .textrun-card .tr-label{font-size:9.5px;color:var(--text-faint);margin-bottom:5px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.05em;}
-
-  /* Status bar */
-  #statusbar{
-    background:#161617;border-top:1px solid var(--border-soft);
-    display:flex;align-items:center;padding:0 14px;gap:16px;
-    font-size:10.5px;color:var(--text-faint);font-family:'DM Mono',monospace;
-  }
-  #statusbar .spacer{flex:1;}
-  #save-status{display:flex;align-items:center;gap:5px;}
-  #save-status::before{
-    content:'';width:6px;height:6px;border-radius:50%;background:var(--text-faint);flex-shrink:0;
-  }
-  #save-status.saved::before{background:var(--accent);}
-  #save-status.saving::before{background:#f2c84b;}
-  #save-status.pending::before{background:var(--text-dim);}
-  #save-status.error::before{background:var(--danger);}
-  .zoom-controls{display:flex;align-items:center;gap:2px;}
-  .zoom-controls button{
-    background:transparent;border:none;color:var(--text-dim);cursor:pointer;width:18px;height:18px;font-size:13px;
-    border-radius:3px;
-  }
-  .zoom-controls button:hover{color:var(--accent-strong);background:var(--panel-3);}
-  #zoom-level{min-width:38px;text-align:center;display:inline-block;}
-
-  ::-webkit-scrollbar{width:8px;height:8px;}
-  ::-webkit-scrollbar-track{background:transparent;}
-  ::-webkit-scrollbar-thumb{background:#3a3a40;border-radius:5px;}
-  ::-webkit-scrollbar-thumb:hover{background:#4a4a50;}
-
-  #file-input{display:none;}
-  #toast{
-    position:fixed;bottom:44px;left:50%;transform:translateX(-50%) translateY(20px);
-    background:#232326;border:1px solid var(--border);color:var(--text);
-    padding:9px 16px;border-radius:6px;font-size:12.5px;opacity:0;pointer-events:none;
-    transition:all .2s ease;z-index:999;box-shadow:0 10px 30px #000a;
-  }
-  #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-
-  .text-edit-box{
-    position:absolute;background:transparent;border:1px dashed var(--accent);color:inherit;
-    outline:none;font-family:'DM Sans',sans-serif;padding:2px;overflow:hidden;white-space:pre-wrap;
-  }
-
-  /* ============================================================
-     DASHBOARD
-     ============================================================ */
-  #dashboard-view{
-    height:100vh; overflow-y:auto; background:var(--bg);
-    display:flex; flex-direction:column;
-  }
-  #dash-header{
-    display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap;
-    padding:30px 40px 18px; border-bottom:1px solid var(--border-soft);
-    position:sticky; top:0; background:var(--bg); z-index:5;
-  }
-  .dash-brand{display:flex; align-items:center; gap:13px;}
-  .dash-brand .mark{
-    width:40px;height:40px;border-radius:9px;background:linear-gradient(135deg,var(--accent),#2a8f7d);
-    display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#0c1614;
-    font-family:'Syne',sans-serif;flex-shrink:0;
-  }
-  .dash-brand h1{font-size:19px;margin:0;font-weight:800;letter-spacing:-.01em;}
-  .dash-brand p{margin:3px 0 0;font-size:11.5px;color:var(--text-faint);font-family:'DM Mono',monospace;}
-  .dash-actions{display:flex;align-items:center;gap:12px;}
-  .dash-search{position:relative;}
-  .dash-search input{
-    background:var(--panel-2);border:1px solid var(--border);color:var(--text);
-    padding:8px 12px 8px 30px;border-radius:6px;font-size:12.5px;width:220px;font-family:inherit;
-  }
-  .dash-search input:focus{outline:none;border-color:var(--accent);}
-  .dash-search svg{
-    position:absolute;left:9px;top:50%;transform:translateY(-50%);width:13px;height:13px;color:var(--text-faint);
-    pointer-events:none;
-  }
-  #dash-storage-note{
-    padding:12px 40px 0; font-size:11px; color:var(--text-faint); font-family:'DM Mono',monospace;
-  }
-  #dash-grid{
-    display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-    gap:18px; padding:18px 40px 40px;
-  }
-  .dash-card{
-    background:var(--panel); border:1px solid var(--border-soft); border-radius:9px; overflow:hidden;
-    cursor:pointer; transition:border-color .15s ease, transform .15s ease; position:relative;
-  }
-  .dash-card:hover{border-color:var(--accent); transform:translateY(-2px);}
-  .dash-thumb{
-    width:100%; aspect-ratio:4/3; background:#0f0f10; position:relative;
-    display:flex; align-items:center; justify-content:center; overflow:hidden;
-    border-bottom:1px solid var(--border-soft);
-  }
-  .dash-thumb img{width:100%;height:100%;object-fit:contain;}
-  .dash-thumb-empty{color:var(--text-faint);font-size:10px;font-family:'DM Mono',monospace;}
-  .dash-type{
-    position:absolute; top:8px; left:8px; font-family:'DM Mono',monospace; font-size:9px;
-    text-transform:uppercase; letter-spacing:.06em; background:#000000b0; color:var(--accent-strong);
-    padding:3px 7px; border-radius:3px;
-  }
-  .dash-meta{padding:10px 12px 11px;}
-  .dash-title{font-size:12.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .dash-sub{font-size:10.5px;color:var(--text-faint);margin-top:3px;font-family:'DM Mono',monospace;}
-  .dash-card-actions{
-    position:absolute; top:8px; right:8px; display:flex; gap:4px; opacity:0; transition:opacity .12s ease;
-  }
-  .dash-card:hover .dash-card-actions{opacity:1;}
-  .dash-card-actions .icon-btn{
-    background:#000000b0; color:var(--text-dim); width:23px; height:23px; border-radius:4px;
-  }
-  .dash-card-actions .icon-btn:hover{color:var(--accent-strong); background:#000000e0;}
-  .dash-card-actions .icon-btn svg{width:12px;height:12px;}
-  #dash-empty{
-    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:14px; text-align:center; padding:60px 20px; color:var(--text-faint);
-  }
-  #dash-empty .mark-lg{
-    width:56px;height:56px;border-radius:12px;background:var(--panel-2);border:1px solid var(--border);
-    display:flex;align-items:center;justify-content:center;color:var(--text-faint);
-  }
-  #dash-empty .mark-lg svg{width:24px;height:24px;}
-  #dash-empty h2{font-size:18px;color:var(--text-dim);font-weight:700;margin:0;}
-  #dash-empty p{font-size:12.5px;max-width:360px;line-height:1.65;margin:0;}
+@media(max-width:860px){
+ .top-brand span{display:none}.top-brand{width:auto}
+ #sidebar{position:fixed;z-index:40;top:64px;bottom:0;left:0;background:var(--bg);margin-left:-260px;box-shadow:var(--shadow);width:256px}
+ body.sb-open #sidebar{margin-left:0}
+ body.sb-collapsed #sidebar{margin-left:-260px}
+ #main{margin:0 8px 8px}
+ .row .who{width:110px}
+ .row .snip{display:none}
+ .reader{padding:14px}.msg-body,.msg-atts,.msg-act{padding-left:16px}
+ .compose.max{inset:0;border-radius:0}
+}
 </style>
 </head>
-<body class="view-dashboard">
+<body>
 
-<!-- ============================================================
-     DASHBOARD VIEW
-     ============================================================ -->
-<div id="dashboard-view">
-  <header id="dash-header">
-    <div class="dash-brand">
-      <span class="mark">PE</span>
-      <div>
-        <h1>Pro Editor</h1>
-        <p>Autosaved to this browser · PDF · PPTX · PNG · JPG</p>
-      </div>
-    </div>
-    <div class="dash-actions">
-      <div class="dash-search">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        <input type="text" id="dash-search-input" placeholder="Search documents…">
-      </div>
-      <button class="tb-btn primary" id="dash-new-btn">+ New document</button>
+<div id="auth" class="auth" hidden>
+  <div class="auth-card">
+    <div class="brand"><div class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>Pro Mail</div>
+    <p class="sub">Fast, private, professional email.</p>
+    <div id="cfgWarn" class="banner" hidden>Firebase is not configured yet. Add your project settings to <b>FIREBASE_CONFIG</b> in this file.</div>
+    <div class="tabs"><button type="button" id="tabIn" class="on">Sign in</button><button type="button" id="tabUp">Create account</button></div>
+    <form id="authForm" autocomplete="on">
+      <label class="fld" id="nameFld" hidden><span>Full name</span><input id="aName" maxlength="60" autocomplete="name"></label>
+      <label class="fld"><span>Username</span><div class="suffix"><input id="aUser" autocomplete="username" spellcheck="false" autocapitalize="none"><em id="aDomain"></em></div></label>
+      <label class="fld"><span>Password</span><input id="aPass" type="password" autocomplete="current-password"></label>
+      <div class="err" id="authErr"></div>
+      <button class="btn primary" id="authBtn" type="submit">Sign in</button>
+    </form>
+  </div>
+</div>
+
+<div id="app" hidden>
+  <header class="topbar">
+    <button class="icon-btn" data-act="menu" title="Main menu" id="menuBtn"></button>
+    <div class="top-brand brand"><div class="logo" style="width:32px;height:32px"></div><span>Pro Mail</span></div>
+    <div class="search"><span id="searchIc"></span><input id="search" placeholder="Search mail  (from: to: subject: is:unread has:attachment label:)" autocomplete="off" spellcheck="false"><button class="icon-btn sm" data-act="clearsearch" id="clearSearch" hidden title="Clear search"></button></div>
+    <div class="top-actions">
+      <button class="icon-btn" data-act="theme" title="Toggle theme" id="themeBtn"></button>
+      <button class="icon-btn" data-act="settings" title="Settings" id="setBtn"></button>
+      <button class="icon-btn" data-act="usermenu" title="Account" id="userBtn" style="width:44px"></button>
     </div>
   </header>
-  <div id="dash-storage-note"></div>
-  <div id="dash-grid"></div>
-  <div id="dash-empty" style="display:none;">
-    <div class="mark-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div>
-    <h2>No documents yet</h2>
-    <p>Import a PDF, PPTX, PNG or JPG to start editing. Every change is saved automatically to this browser — nothing leaves your device.</p>
-    <button class="tb-btn primary" id="dash-empty-new">Import a file</button>
+  <div class="layout">
+    <aside id="sidebar"></aside>
+    <main id="main"></main>
   </div>
+  <div id="composeDock"></div>
 </div>
+<div id="overlay"></div>
+<div id="toasts"></div>
 
-<!-- ============================================================
-     EDITOR VIEW
-     ============================================================ -->
-<div id="app">
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, deleteUser, updateProfile } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, orderBy, limit, onSnapshot, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-  <!-- MENU BAR -->
-  <div id="menubar">
-    <div class="brand-mini"><span class="mark">PE</span><span>Pro Editor</span></div>
-    <div class="menu-item" data-menu="file">
-      <button class="menu-label">File</button>
-      <div class="menu-dropdown">
-        <button class="menu-opt" id="menu-open">Import…<span class="kbd">Ctrl+O</span></button>
-        <button class="menu-opt" id="menu-save">Save<span class="kbd">Ctrl+S</span></button>
-        <button class="menu-opt" id="menu-export">Export…<span class="kbd">Ctrl+E</span></button>
-        <div class="menu-divider"></div>
-        <button class="menu-opt" id="menu-close" disabled>Back to dashboard</button>
-      </div>
-    </div>
-    <div class="menu-item" data-menu="edit">
-      <button class="menu-label">Edit</button>
-      <div class="menu-dropdown">
-        <button class="menu-opt" id="menu-undo" disabled>Undo<span class="kbd">Ctrl+Z</span></button>
-        <button class="menu-opt" id="menu-redo" disabled>Redo<span class="kbd">Ctrl+Y</span></button>
-        <div class="menu-divider"></div>
-        <button class="menu-opt" id="menu-delete" disabled>Delete selection<span class="kbd">Del</span></button>
-      </div>
-    </div>
-    <div class="menu-item" data-menu="view">
-      <button class="menu-label">View</button>
-      <div class="menu-dropdown">
-        <button class="menu-opt" id="menu-zoomin">Zoom in<span class="kbd">Ctrl++</span></button>
-        <button class="menu-opt" id="menu-zoomout">Zoom out<span class="kbd">Ctrl+−</span></button>
-        <button class="menu-opt" id="menu-zoomfit">Reset zoom<span class="kbd">Ctrl+0</span></button>
-      </div>
-    </div>
-    <div class="menu-item" data-menu="object">
-      <button class="menu-label">Object</button>
-      <div class="menu-dropdown">
-        <button class="menu-opt" id="menu-addpage">Duplicate page</button>
-        <button class="menu-opt" id="menu-rotate">Rotate page 90°</button>
-        <button class="menu-opt" id="menu-delpage">Delete page</button>
-      </div>
-    </div>
-    <div class="menu-item" data-menu="help">
-      <button class="menu-label">Help</button>
-      <div class="menu-dropdown">
-        <div class="menu-opt" style="cursor:default;" id="menu-about">V, P, T, R, O, L, A, H, E, C — tool shortcuts</div>
-      </div>
-    </div>
-  </div>
+/* ============================ CONFIG ============================ */
+const firebaseConfig = {
+  apiKey: "AIzaSyAxV-h9ugxGq9LyQmg6nUutqOjDFP_bGmk",
+  authDomain: "pro-mail-2941d.firebaseapp.com",
+  projectId: "pro-mail-2941d",
+  storageBucket: "pro-mail-2941d.firebasestorage.app",
+  messagingSenderId: "265443724637",
+  appId: "1:265443724637:web:7e9c3da27315128edbacb4"
+};
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxv4Vg23Q-HzMg_SNPgg8PKK1Z1YWv5Au3ZyxHMdV7OU1dUeBkOKu_3xI-HxGiTZC4/exec";   // Apps Script /exec URL (attachments + external email)
+const MAIL_DOMAIN = "promail.app";                 // must match firestore.rules and Code.gs
+const MAX_ATTACH = 10 * 1024 * 1024;
+const MAX_RECIPIENTS = 25;
+const PAGE = 200;
+/* ================================================================ */
 
-  <!-- TOPBAR -->
-  <div id="topbar">
-    <button class="tb-btn icononly" id="btn-home" title="Back to dashboard"></button>
-    <div class="brand"><span class="dot"></span>Pro Editor</div>
-    <span class="badge" id="format-badge">no file</span>
-    <div class="topbar-sep"></div>
-    <button class="tb-btn" id="btn-open">Import file</button>
-    <span id="filename"></span>
-    <div class="spacer"></div>
-    <button class="tb-btn" id="btn-undo" disabled title="Undo (Ctrl+Z)">Undo</button>
-    <button class="tb-btn" id="btn-redo" disabled title="Redo (Ctrl+Y)">Redo</button>
-    <div class="topbar-sep"></div>
-    <button class="tb-btn primary" id="btn-export" disabled>Export</button>
-  </div>
+const CFG_OK = !String(FIREBASE_CONFIG.apiKey).startsWith("YOUR_");
+const GAS_ON = /^https:\/\/script\.google\.com\//.test(GAS_URL);
+let app, auth, db;
+if (CFG_OK) { app = initializeApp(FIREBASE_CONFIG); auth = getAuth(app); db = getFirestore(app); }
 
-  <!-- OPTIONS BAR (contextual, per active tool) -->
-  <div id="optionsbar"></div>
+/* ----------------------------- helpers ----------------------------- */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const EMAIL_RE = /^[^\s@<>,;]+@[^\s@<>,;]+\.[^\s@<>,;]+$/;
+const USER_RE = /^[a-z0-9][a-z0-9._]{2,29}$/;
+const PALETTE = ['#d93025', '#e8710a', '#188038', '#1a73e8', '#7b3fe4', '#c2185b', '#00897b', '#5f6368', '#a15c00', '#0b8043'];
+const colorOf = s => { let h = 0; for (const ch of String(s)) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return PALETTE[h % PALETTE.length]; };
+const uniq = a => [...new Set(a)];
+const isInternal = a => a.endsWith('@' + MAIL_DOMAIN);
 
-  <!-- BODY -->
-  <div id="body">
-
-    <!-- TOOL RAIL -->
-    <div id="toolrail"></div>
-
-    <!-- LEFT PANEL -->
-    <div id="left-panel"></div>
-
-    <!-- STAGE -->
-    <div id="stage-wrap">
-      <div id="empty-state">
-        <div id="drop-zone">
-          <h2>Drop a file to start</h2>
-          <p>PDF · PPTX · PNG / JPG</p>
-          <button class="tb-btn primary" id="btn-open-2">Browse files</button>
-        </div>
-      </div>
-      <div id="canvas-holder">
-        <canvas id="base-canvas"></canvas>
-        <canvas id="overlay-canvas"></canvas>
-      </div>
-    </div>
-
-    <!-- RIGHT PANEL -->
-    <div id="right-panel">
-      <div class="tabs">
-        <button class="tab-btn active" data-tab="pages">Pages</button>
-        <button class="tab-btn" data-tab="text">Text</button>
-      </div>
-      <div class="tab-panel active" id="tab-pages"></div>
-      <div class="tab-panel" id="tab-text"></div>
-    </div>
-
-  </div>
-
-  <!-- STATUS BAR -->
-  <div id="statusbar">
-    <span id="status-info">No document loaded</span>
-    <span id="save-status"></span>
-    <div class="spacer"></div>
-    <div class="zoom-controls">
-      <button id="zoom-out">−</button>
-      <span id="zoom-level">100%</span>
-      <button id="zoom-in">+</button>
-    </div>
-  </div>
-
-</div>
-
-<input type="file" id="file-input" accept=".pdf,.pptx,.png,.jpg,.jpeg">
-<div id="toast"></div>
-
-<script>
-'use strict';
-if (window.pdfjsLib) {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.js';
-}
-
-/* ============================================================
-   ICONS (inline SVG strings, stroke-based, minimal)
-   ============================================================ */
 const ICONS = {
-  select: '<path d="M4 3l7 16 2-7 7-2z"/>',
-  pen: '<path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L11 4l7 7z"/><path d="M2 21l4-1 9-9-3-3-9 9z"/>',
-  text: '<path d="M4 5h16"/><path d="M12 5v14"/><path d="M8 19h8"/>',
-  rect: '<rect x="3" y="5" width="18" height="14" rx="1"/>',
-  ellipse: '<ellipse cx="12" cy="12" rx="9" ry="7"/>',
-  line: '<path d="M4 20L20 4"/>',
-  arrow: '<path d="M4 20L20 4"/><path d="M20 4h-7"/><path d="M20 4v7"/>',
-  highlight: '<path d="M3 21h18"/><path d="M7 17l9-9 3 3-9 9H7v-3z"/>',
-  eraser: '<path d="M17 3l4 4-9.5 9.5H7L3 12.5z"/><path d="M7 21h14"/>',
-  crop: '<path d="M6 2v14a2 2 0 002 2h14"/><path d="M18 22V8a2 2 0 00-2-2H2"/>',
-  image: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>',
-  trash: '<path d="M3 6h18"/><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>',
-  dup: '<rect x="9" y="9" width="12" height="12" rx="1"/><path d="M5 15V5a2 2 0 012-2h10"/>',
-  rotate: '<path d="M21 12a9 9 0 11-3.5-7.1"/><path d="M21 3v6h-6"/>',
-  up: '<path d="M18 15l-6-6-6 6"/>',
-  down: '<path d="M6 9l6 6 6-6"/>',
-  home: '<path d="M4 11l8-7 8 7"/><path d="M6 10v9a1 1 0 001 1h3v-6h4v6h3a1 1 0 001-1v-9"/>',
-  pencil: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/>',
+  menu: '<line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>',
+  search: '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+  inbox: '<polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
+  star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+  send: '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
+  file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+  trash: '<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+  spam: '<polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+  archive: '<polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>',
+  mail: '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>',
+  plus: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+  minus: '<line x1="5" y1="12" x2="19" y2="12"/>',
+  x: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+  back: '<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>',
+  reply: '<polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/>',
+  forward: '<polyline points="15 17 20 12 15 7"/><path d="M4 18v-2a4 4 0 0 1 4-4h12"/>',
+  clip: '<path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>',
+  refresh: '<polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>',
+  sliders: '<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>',
+  moon: '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
+  sun: '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>',
+  tag: '<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>',
+  check: '<polyline points="20 6 9 17 4 12"/>',
+  max: '<polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>',
+  logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>',
+  link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+  list: '<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>',
+  erase: '<path d="M20 20H9l-6-6a2 2 0 0 1 0-2.8L12.2 3a2 2 0 0 1 2.8 0l6 6a2 2 0 0 1 0 2.8L13 20"/>'
 };
-function svgIcon(name){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]}</svg>`; }
+const ic = (n, s = 20) => `<svg class="ic" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[n] || ''}</svg>`;
 
-/* ============================================================
-   STATE
-   ============================================================ */
+function fmtList(t) {
+  const d = new Date(t), n = new Date();
+  if (d.toDateString() === n.toDateString()) return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  if (d.getFullYear() === n.getFullYear()) return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  return d.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: '2-digit' });
+}
+const fmtFull = t => new Date(t).toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+const fmtSize = b => b < 1024 ? b + ' B' : b < 1048576 ? (b / 1024).toFixed(0) + ' KB' : (b / 1048576).toFixed(1) + ' MB';
+const textOf = html => { const d = document.createElement('div'); d.innerHTML = html; return (d.textContent || '').replace(/\s+/g, ' ').trim(); };
+const avatar = (name, size = 36) => `<div class="avatar" style="width:${size}px;height:${size}px;background:${colorOf(name)};font-size:${Math.round(size * .42)}px">${esc((name || '?').trim()[0] || '?')}</div>`;
+
+/* --------------------------- HTML sanitizer --------------------------- */
+const OK_TAGS = new Set(['A', 'B', 'STRONG', 'I', 'EM', 'U', 'S', 'STRIKE', 'BR', 'P', 'DIV', 'SPAN', 'UL', 'OL', 'LI', 'BLOCKQUOTE', 'PRE', 'CODE', 'H1', 'H2', 'H3', 'H4', 'HR', 'TABLE', 'THEAD', 'TBODY', 'TR', 'TD', 'TH', 'SUB', 'SUP']);
+const DROP_TAGS = new Set(['SCRIPT', 'STYLE', 'IFRAME', 'OBJECT', 'EMBED', 'NOSCRIPT', 'TEMPLATE', 'SVG', 'MATH', 'FORM', 'TITLE', 'HEAD', 'LINK', 'META', 'IMG', 'VIDEO', 'AUDIO', 'CANVAS', 'TEXTAREA', 'SELECT', 'BUTTON']);
+const STYLE_OK = new Set(['color', 'background-color', 'font-weight', 'font-style', 'text-decoration', 'text-align', 'font-size']);
+function safeStyle(v) {
+  return v.split(';').map(x => x.trim()).filter(Boolean).map(x => {
+    const i = x.indexOf(':'); if (i < 0) return '';
+    const k = x.slice(0, i).trim().toLowerCase(), val = x.slice(i + 1).trim();
+    return STYLE_OK.has(k) && /^[#\w\s.,%()-]+$/.test(val) && !/url|expression|javascript/i.test(val) ? `${k}:${val}` : '';
+  }).filter(Boolean).join(';');
+}
+function sanitize(html) {
+  const src = new DOMParser().parseFromString('<body>' + String(html || ''), 'text/html').body;
+  const out = document.createElement('div');
+  const walk = (from, to) => {
+    for (const n of [...from.childNodes]) {
+      if (n.nodeType === 3) { to.appendChild(document.createTextNode(n.nodeValue)); continue; }
+      if (n.nodeType !== 1) continue;
+      const tag = n.tagName;
+      if (DROP_TAGS.has(tag)) continue;
+      if (!OK_TAGS.has(tag)) { walk(n, to); continue; }
+      const el = document.createElement(tag.toLowerCase());
+      if (tag === 'A') {
+        try {
+          const u = new URL(n.getAttribute('href') || '', 'https://x.invalid');
+          if (['http:', 'https:', 'mailto:'].includes(u.protocol) && u.host !== 'x.invalid' || u.protocol === 'mailto:') {
+            el.setAttribute('href', n.getAttribute('href')); el.setAttribute('target', '_blank'); el.setAttribute('rel', 'noopener noreferrer nofollow');
+          }
+        } catch { /* drop href */ }
+      }
+      const st = n.getAttribute('style'); if (st) { const s = safeStyle(st); if (s) el.setAttribute('style', s); }
+      walk(n, el); to.appendChild(el);
+    }
+  };
+  walk(src, out);
+  return out.innerHTML;
+}
+const safeAttUrl = u => /^https:\/\/(drive\.google\.com|drive\.usercontent\.google\.com|docs\.google\.com)\//.test(u || '');
+
+/* ------------------------------- state ------------------------------- */
 const state = {
-  fileType: null,        // 'pdf' | 'pptx' | 'png'
-  fileName: '',
-  pages: [],              // {baseCanvas, objects:[], width, height, textRuns?:[], slideXml?:string, slideRelPath?:string}
-  currentPage: 0,
-  tool: 'select',
-  color: '#5ee0c1',
-  strokeWidth: 4,
-  fontSize: 22,
-  fontFamily: 'DM Sans',
-  zoom: 1,
-  selectedObjectId: null,
-  history: [],            // per-page undo stacks: {pageIndex, snapshot}
-  historyIndex: -1,
-  pptxZip: null,           // JSZip instance, kept for re-export
-  pptxSlideOrder: [],      // array of {relPath, rId}
-  pptxPresentationXml: null,
-  pptxSlideSize: {cx: 12192000, cy: 6858000},
-  projectId: null,         // id of the record in local (IndexedDB) storage
-  projectName: '',
-  originalPptxBlob: null,  // original .pptx file, kept so pptx structure survives reloads
+  user: null, profile: null, mails: [], limit: PAGE, loaded: false, unsubMails: null, unsubProfile: null,
+  view: 'inbox', query: '', selected: new Set(), openKey: null, cursor: -1, threads: [], expanded: new Set(),
+  composes: new Map(), signingUp: false
 };
+const me = () => state.user.uid;
+const keyOf = m => (state.view === 'drafts' && !state.query) ? m.id : m.threadId;
 
-let dragState = null; // active pointer interaction
-let activePointerId = null; // guards against multi-touch / accidental second-finger input while drawing
-let idCounter = 1;
-const newId = () => 'o' + (idCounter++);
-
-/* Normalize pressure across input types: mouse/touch report 0 or 0.5 with
-   no real pressure signal, so only trust it for an actual pen/stylus. */
-function pointerPressure(e){
-  if (e.pointerType === 'pen' && e.pressure > 0) return e.pressure;
-  return 1;
+function normMail(d) {
+  const x = d.data({ serverTimestamps: 'estimate' });
+  return { id: d.id, ...x, to: x.to || [], cc: x.cc || [], bcc: x.bcc || [], labels: x.labels || [], attachments: x.attachments || [], from: x.from || { name: '', address: '' }, t: x.ts && x.ts.toMillis ? x.ts.toMillis() : Date.now() };
 }
 
-const COLORS = ['#5ee0c1','#f2f2f2','#e0685e','#f2c84b','#6ea8fe','#c78bf0','#ff9f6b','#111318'];
-
-/* ============================================================
-   DOM refs
-   ============================================================ */
-const $ = sel => document.querySelector(sel);
-const baseCanvas = $('#base-canvas');
-const overlayCanvas = $('#overlay-canvas');
-const baseCtx = baseCanvas.getContext('2d');
-const octx = overlayCanvas.getContext('2d');
-const canvasHolder = $('#canvas-holder');
-const emptyState = $('#empty-state');
-const fileInput = $('#file-input');
-
-/* ============================================================
-   TOAST
-   ============================================================ */
-let toastTimer = null;
-function toast(msg){
-  const t = $('#toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(()=>t.classList.remove('show'), 2400);
+/* ------------------------------ UI utils ------------------------------ */
+function toast(msg, o = {}) {
+  const el = document.createElement('div'); el.className = 'toast' + (o.error ? ' error' : '');
+  el.innerHTML = `<span>${esc(msg)}</span>` + (o.action ? `<button>${esc(o.action)}</button>` : '');
+  let gone = false; const kill = () => { if (!gone) { gone = true; el.remove(); } };
+  if (o.action) el.querySelector('button').onclick = () => { kill(); o.onAction && o.onAction(); };
+  $('#toasts').appendChild(el); setTimeout(kill, o.ms || 4000);
 }
-
-/* ============================================================
-   TOOL RAIL
-   ============================================================ */
-const TOOLS = [
-  {id:'select', icon:'select', label:'Select (V)'},
-  {id:'pen', icon:'pen', label:'Pen (P)'},
-  {id:'text', icon:'text', label:'Text (T)'},
-  {id:'rect', icon:'rect', label:'Rectangle (R)'},
-  {id:'ellipse', icon:'ellipse', label:'Ellipse (O)'},
-  {id:'line', icon:'line', label:'Line (L)'},
-  {id:'arrow', icon:'arrow', label:'Arrow (A)'},
-  {id:'highlight', icon:'highlight', label:'Highlighter (H)'},
-  {id:'eraser', icon:'eraser', label:'Eraser (E)'},
-  {id:'crop', icon:'crop', label:'Crop (C)'},
-  {id:'image', icon:'image', label:'Insert image'},
-];
-function buildToolRail(){
-  const rail = $('#toolrail');
-  rail.innerHTML = '';
-  TOOLS.forEach((t,i)=>{
-    const btn = document.createElement('button');
-    btn.className = 'tool-btn' + (state.tool===t.id ? ' active':'');
-    btn.title = t.label;
-    btn.dataset.tool = t.id;
-    btn.innerHTML = svgIcon(t.icon);
-    btn.onclick = () => {
-      if (t.id === 'image'){ triggerImageInsert(); return; }
-      setTool(t.id);
-    };
-    rail.appendChild(btn);
-    if (t.id==='text') { const sep=document.createElement('div'); sep.className='tool-sep'; rail.appendChild(sep); }
-    if (t.id==='highlight') { const sep=document.createElement('div'); sep.className='tool-sep'; rail.appendChild(sep); }
+function modal(html) {
+  const wrap = document.createElement('div'); wrap.className = 'wrap';
+  wrap.innerHTML = `<div class="modal" role="dialog" aria-modal="true">${html}</div>`;
+  $('#overlay').appendChild(wrap);
+  const close = () => wrap.remove();
+  wrap.addEventListener('mousedown', e => { if (e.target === wrap) close(); });
+  return { el: wrap.firstElementChild, close };
+}
+function askText(title, { placeholder = '', value = '', ok = 'Save' } = {}) {
+  return new Promise(res => {
+    const m = modal(`<h2>${esc(title)}</h2><form><label class="fld"><span>${esc(placeholder)}</span><input maxlength="200" value="${esc(value)}"></label><div class="acts"><button type="button" class="btn" data-x>Cancel</button><button class="btn primary">${esc(ok)}</button></div></form>`);
+    const inp = $('input', m.el); inp.focus(); inp.select();
+    m.el.querySelector('[data-x]').onclick = () => { m.close(); res(null); };
+    $('form', m.el).onsubmit = e => { e.preventDefault(); const v = inp.value.trim(); m.close(); res(v || null); };
   });
 }
-function setTool(id){
-  state.tool = id;
-  state.selectedObjectId = null;
-  document.querySelectorAll('.tool-btn').forEach(b=>b.classList.toggle('active', b.dataset.tool===id));
-  overlayCanvas.style.cursor = id==='select' ? 'default' : (id==='eraser' ? 'not-allowed' : 'crosshair');
-  buildLeftPanel();
-  updateOptionsBar();
-  redrawOverlay();
-}
-
-/* ============================================================
-   MENU BAR
-   ============================================================ */
-document.querySelectorAll('.menu-item').forEach(item=>{
-  item.querySelector('.menu-label').addEventListener('click', e=>{
-    e.stopPropagation();
-    const wasOpen = item.classList.contains('open');
-    document.querySelectorAll('.menu-item').forEach(m=>m.classList.remove('open'));
-    if (!wasOpen) item.classList.add('open');
-  });
-});
-window.addEventListener('click', ()=> document.querySelectorAll('.menu-item').forEach(m=>m.classList.remove('open')));
-
-$('#menu-open').onclick = () => fileInput.click();
-$('#menu-save').onclick = () => { if (state.pages.length){ saveCurrentProject().then(()=>toast('Saved')); } };
-$('#menu-export').onclick = () => exportFile();
-$('#menu-undo').onclick = () => undo();
-$('#menu-redo').onclick = () => redo();
-$('#menu-delete').onclick = () => { if (state.selectedObjectId) deleteSelectedObject(); };
-$('#menu-zoomin').onclick = () => $('#zoom-in').click();
-$('#menu-zoomout').onclick = () => $('#zoom-out').click();
-$('#menu-zoomfit').onclick = () => { state.zoom = 1; applyZoomStyle(); updateStatus(); };
-$('#menu-addpage').onclick = () => { if (state.pages.length) addOrDuplicatePage(); };
-$('#menu-rotate').onclick = () => { if (state.pages.length) rotatePage(state.currentPage); };
-$('#menu-delpage').onclick = () => { if (state.pages.length) deletePage(state.currentPage); };
-$('#menu-close').onclick = () => { if (state.pages.length) switchView('dashboard'); };
-function syncMenuState(){
-  $('#menu-undo').disabled = state.historyIndex<=0;
-  $('#menu-redo').disabled = state.historyIndex>=state.history.length-1;
-  $('#menu-delete').disabled = !state.selectedObjectId;
-  $('#menu-close').disabled = !state.pages.length;
-}
-
-/* ============================================================
-   OPTIONS BAR (contextual per-tool strip, Adobe-style)
-   ============================================================ */
-const TOOL_META = {
-  select:{label:'Move / Select', key:'V'}, pen:{label:'Pencil', key:'P'}, text:{label:'Type', key:'T'},
-  rect:{label:'Rectangle', key:'R'}, ellipse:{label:'Ellipse', key:'O'}, line:{label:'Line', key:'L'},
-  arrow:{label:'Arrow', key:'A'}, highlight:{label:'Highlighter', key:'H'}, eraser:{label:'Eraser', key:'E'},
-  crop:{label:'Crop', key:'C'},
-};
-function updateOptionsBar(){
-  const bar = $('#optionsbar');
-  const meta = TOOL_META[state.tool] || {label:'Select', key:''};
-  let html = `<span class="ob-toolname">${meta.label}</span>`;
-  if (meta.key) html += `<span class="ob-kbd">${meta.key}</span>`;
-
-  if (['pen','rect','ellipse','line','arrow','highlight'].includes(state.tool)){
-    html += `<div class="ob-group">${COLORS.map(c=>`<div class="ob-swatch ${c===state.color?'selected':''}" data-obcolor="${c}" style="background:${c}"></div>`).join('')}</div>`;
-    html += `<div class="ob-sep"></div><span>Weight</span>`;
-  }
-  if (state.tool === 'text'){
-    html += `<div class="ob-group">${COLORS.map(c=>`<div class="ob-swatch ${c===state.color?'selected':''}" data-obcolor="${c}" style="background:${c}"></div>`).join('')}</div>`;
-  }
-  if (state.pages.length){
-    html += `<div class="spacer" style="flex:1"></div>`;
-    const label = state.fileType==='pptx' ? 'Slide' : 'Page';
-    html += `<div class="ob-group">
-      <button class="ob-nav-btn" id="ob-prev">${svgIcon('up')}</button>
-      <span class="ob-page-indicator">${label} ${state.currentPage+1}/${state.pages.length}</span>
-      <button class="ob-nav-btn" id="ob-next">${svgIcon('down')}</button>
-    </div>`;
-  }
-  bar.innerHTML = html;
-  bar.querySelectorAll('[data-obcolor]').forEach(sw=>{
-    sw.onclick = () => { applyColorChange(sw.dataset.obcolor); updateOptionsBar(); };
-  });
-  const prev = $('#ob-prev'), next = $('#ob-next');
-  if (prev) prev.onclick = () => gotoPage(state.currentPage-1);
-  if (next) next.onclick = () => gotoPage(state.currentPage+1);
-  syncMenuState();
-}
-function gotoPage(i){
-  if (i<0 || i>=state.pages.length) return;
-  state.currentPage = i; state.selectedObjectId = null;
-  renderCurrentPage(); buildPagesTab(); buildTextTab(); updateStatus(); updateOptionsBar();
-}
-
-/* ============================================================
-   LEFT PANEL (properties)
-   ============================================================ */
-function buildLeftPanel(){
-  const p = $('#left-panel');
-  const showsStroke = ['pen','rect','ellipse','line','arrow','highlight'].includes(state.tool);
-  const showsText = state.tool === 'text';
-  const showsFill = ['rect','ellipse'].includes(state.tool);
-
-  let html = `<div class="panel-title">${state.tool==='select' ? 'Properties' : 'Tool options'}</div>`;
-
-  if (state.tool === 'select'){
-    const obj = getSelectedObject();
-    if (!obj){
-      html += `<p class="hint">Select an object on the canvas to edit its color, size or text. Use Delete/Backspace to remove it.</p>`;
-    } else {
-      html += colorField(obj.color || state.color, c=>{ obj.color = c; commitHistory(); redrawOverlay(); });
-      if (obj.type !== 'path'){
-        html += strokeField(obj.strokeWidth ?? state.strokeWidth, w=>{ obj.strokeWidth = w; commitHistory(); redrawOverlay(); });
-      }
-      if (obj.type === 'text'){
-        html += fontSizeField(obj.fontSize || state.fontSize, s=>{ obj.fontSize = s; commitHistory(); redrawOverlay(); });
-      }
-      html += `<div class="btn-row"><button class="btn-sm" id="delete-obj">Delete object</button></div>`;
-    }
-  } else {
-    if (showsStroke) html += colorField(state.color, c=>{ state.color = c; });
-    if (showsFill) html += `<p class="hint">Shapes are drawn as outlines. Select the object afterward to change its stroke color or width.</p>`;
-    if (showsStroke) html += strokeField(state.strokeWidth, w=>{ state.strokeWidth = w; });
-    if (showsText) html += fontSizeField(state.fontSize, s=>{ state.fontSize = s; });
-    if (state.tool === 'crop') html += `<p class="hint">Drag a rectangle on the canvas, then press <b>Enter</b> to crop the page, or <b>Esc</b> to cancel.</p>`;
-    if (state.tool === 'eraser') html += `<p class="hint">Click any annotation to remove it.</p>`;
-  }
-
-  p.innerHTML = html;
-  wireLeftPanelEvents();
-}
-function colorField(current, onChange){
-  return `<div class="field"><label>Color</label>
-    <div class="swatches">
-      ${COLORS.map(c=>`<div class="swatch ${c===current?'selected':''}" data-color="${c}" style="background:${c}"></div>`).join('')}
-      <input type="color" id="custom-color" value="${current}">
-    </div></div>`;
-}
-function strokeField(current, onChange){
-  return `<div class="field"><label>Stroke width</label>
-    <div class="range-row">
-      <input type="range" id="stroke-range" min="1" max="24" value="${current}">
-      <span class="range-val">${current}px</span>
-    </div></div>`;
-}
-function fontSizeField(current, onChange){
-  return `<div class="field"><label>Font size</label>
-    <div class="range-row">
-      <input type="range" id="font-range" min="10" max="96" value="${current}">
-      <span class="range-val">${current}px</span>
-    </div></div>`;
-}
-function wireLeftPanelEvents(){
-  document.querySelectorAll('.swatch[data-color]').forEach(sw=>{
-    sw.onclick = () => {
-      const c = sw.dataset.color;
-      applyColorChange(c);
-    };
-  });
-  const custom = $('#custom-color');
-  if (custom) custom.oninput = () => applyColorChange(custom.value);
-
-  const strokeRange = $('#stroke-range');
-  if (strokeRange) strokeRange.oninput = () => {
-    const w = +strokeRange.value;
-    strokeRange.nextElementSibling.textContent = w+'px';
-    applyStrokeChange(w);
-  };
-  const fontRange = $('#font-range');
-  if (fontRange) fontRange.oninput = () => {
-    const s = +fontRange.value;
-    fontRange.nextElementSibling.textContent = s+'px';
-    applyFontChange(s);
-  };
-  const delBtn = $('#delete-obj');
-  if (delBtn) delBtn.onclick = () => { deleteSelectedObject(); };
-}
-function applyColorChange(c){
-  if (state.tool === 'select' && getSelectedObject()){
-    getSelectedObject().color = c; commitHistory();
-  } else {
-    state.color = c;
-  }
-  buildLeftPanel(); redrawOverlay();
-}
-function applyStrokeChange(w){
-  if (state.tool === 'select' && getSelectedObject()){
-    getSelectedObject().strokeWidth = w; commitHistory();
-  } else { state.strokeWidth = w; }
-  redrawOverlay();
-}
-function applyFontChange(s){
-  if (state.tool === 'select' && getSelectedObject() && getSelectedObject().type==='text'){
-    getSelectedObject().fontSize = s; commitHistory();
-  } else { state.fontSize = s; }
-  redrawOverlay();
-}
-
-/* ============================================================
-   FILE LOADING
-   ============================================================ */
-$('#btn-open').onclick = () => fileInput.click();
-$('#btn-open-2').onclick = () => fileInput.click();
-fileInput.onchange = e => { if (e.target.files[0]) loadFile(e.target.files[0]); e.target.value=''; };
-
-const dropZone = $('#drop-zone');
-['dragover','dragenter'].forEach(ev => dropZone.addEventListener(ev, e=>{ e.preventDefault(); dropZone.classList.add('dragover'); }));
-['dragleave','drop'].forEach(ev => dropZone.addEventListener(ev, e=>{ e.preventDefault(); dropZone.classList.remove('dragover'); }));
-dropZone.addEventListener('drop', e=>{
-  const f = e.dataTransfer.files[0];
-  if (f) loadFile(f);
-});
-
-async function loadFile(file){
-  const name = file.name.toLowerCase();
-  resetState();
-  state.fileName = file.name;
-  $('#filename').textContent = file.name;
-  try {
-    if (name.endsWith('.pdf')) { state.fileType='pdf'; await loadPDF(file); }
-    else if (name.endsWith('.pptx')) { state.fileType='pptx'; state.originalPptxBlob = file; await loadPPTX(file); }
-    else if (name.match(/\.(png|jpe?g)$/)) { state.fileType='png'; await loadImageFile(file); }
-    else { toast('Unsupported file type'); return; }
-  } catch(err){
-    console.error(err);
-    toast('Could not open file: ' + err.message);
-    return;
-  }
-  $('#format-badge').textContent = state.fileType;
-  $('#btn-export').disabled = false;
-  emptyState.style.display = 'none';
-  canvasHolder.style.display = 'block';
-  state.currentPage = 0;
-  pushHistorySnapshotInit();
-  renderCurrentPage();
-  buildPagesTab();
-  buildTextTab();
-  updateStatus();
-  updateOptionsBar();
-
-  state.projectId = newProjectId();
-  state.projectName = state.fileName;
-  state._createdAt = Date.now();
-  switchView('editor');
-  await saveCurrentProject();
-}
-
-function resetState(){
-  state.pages = [];
-  state.currentPage = 0;
-  state.history = [];
-  state.historyIndex = -1;
-  state.selectedObjectId = null;
-  state.pptxZip = null;
-  state.pptxSlideOrder = [];
-  state.projectId = null;
-  state.projectName = '';
-  state.originalPptxBlob = null;
-  state._createdAt = null;
-}
-
-/* ---- PNG / JPG ---- */
-function loadImageFile(file){
-  return new Promise((resolve, reject)=>{
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = () => {
-      const c = document.createElement('canvas');
-      c.width = img.naturalWidth; c.height = img.naturalHeight;
-      c.getContext('2d').drawImage(img,0,0);
-      state.pages.push({ baseCanvas:c, objects:[], width:c.width, height:c.height });
-      URL.revokeObjectURL(url);
-      resolve();
-    };
-    img.onerror = reject;
-    img.src = url;
+function confirmBox(title, msg, ok = 'Confirm') {
+  return new Promise(res => {
+    const m = modal(`<h2>${esc(title)}</h2><p>${esc(msg)}</p><div class="acts"><button class="btn" data-x>Cancel</button><button class="btn primary" data-ok>${esc(ok)}</button></div>`);
+    m.el.querySelector('[data-x]').onclick = () => { m.close(); res(false); };
+    m.el.querySelector('[data-ok]').onclick = () => { m.close(); res(true); };
+    m.el.querySelector('[data-ok]').focus();
   });
 }
-
-/* ---- PDF ---- */
-async function loadPDF(file){
-  const buf = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({data: buf.slice(0)}).promise;
-  const scale = 1.5;
-  for (let i=1; i<=pdf.numPages; i++){
-    const page = await pdf.getPage(i);
-    const viewport = page.getViewport({scale});
-    const c = document.createElement('canvas');
-    c.width = viewport.width; c.height = viewport.height;
-    await page.render({canvasContext: c.getContext('2d'), viewport}).promise;
-    state.pages.push({ baseCanvas:c, objects:[], width:c.width, height:c.height });
-  }
-}
-
-/* ---- PPTX ----
-   Best-effort client-side renderer: parses slideN.xml for shape positions/text
-   and draws a simplified preview onto canvas. Text edits + slide reorder/
-   delete/duplicate are written back into the real OOXML on export; freehand
-   annotations are baked in as a flattened image layer per slide. */
-async function loadPPTX(file){
-  const zip = await JSZip.loadAsync(file);
-  state.pptxZip = zip;
-
-  const presXmlStr = await zip.file('ppt/presentation.xml').async('string');
-  const presXml = new DOMParser().parseFromString(presXmlStr, 'application/xml');
-  state.pptxPresentationXml = presXmlStr;
-  const sldSz = presXml.getElementsByTagName('p:sldSz')[0];
-  if (sldSz){
-    state.pptxSlideSize = { cx: +sldSz.getAttribute('cx'), cy: +sldSz.getAttribute('cy') };
-  }
-  const relsXmlStr = await zip.file('ppt/_rels/presentation.xml.rels').async('string');
-  const relsXml = new DOMParser().parseFromString(relsXmlStr, 'application/xml');
-  const relMap = {}; // rId -> target path
-  [...relsXml.getElementsByTagName('Relationship')].forEach(r=>{
-    relMap[r.getAttribute('Id')] = r.getAttribute('Target');
+function popover(anchor, items) {
+  document.querySelectorAll('.popover').forEach(p => p.remove());
+  const p = document.createElement('div'); p.className = 'popover';
+  items.forEach(it => {
+    if (it.sep) { p.insertAdjacentHTML('beforeend', '<div class="sep"></div>'); return; }
+    if (it.head) { p.insertAdjacentHTML('beforeend', `<div class="hd">${esc(it.head)}</div>`); return; }
+    const b = document.createElement('button');
+    b.innerHTML = `${it.icon ? ic(it.icon, 18) : ''}<span style="flex:1">${esc(it.label)}</span>${it.checked ? ic('check', 16) : ''}`;
+    b.onclick = () => { p.remove(); it.fn && it.fn(); };
+    p.appendChild(b);
   });
-
-  const sldIds = [...presXml.getElementsByTagName('p:sldId')];
-  state.pptxSlideOrder = sldIds.map(node => {
-    const rId = node.getAttribute('r:id');
-    const target = relMap[rId]; // e.g. slides/slide1.xml
-    return { rId, relPath: 'ppt/' + target.replace(/^\.?\/?/,'') };
-  });
-
-  const renderW = 1000;
-  const renderH = Math.round(state.pptxSlideSize.cy / state.pptxSlideSize.cx * renderW);
-
-  for (const slideRef of state.pptxSlideOrder){
-    const xmlStr = await zip.file(slideRef.relPath).async('string');
-    const dom = new DOMParser().parseFromString(xmlStr, 'application/xml');
-    const c = document.createElement('canvas');
-    c.width = renderW; c.height = renderH;
-    const ctx = c.getContext('2d');
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0,0,renderW,renderH);
-
-    const shapes = [...dom.getElementsByTagName('p:sp')];
-    for (const sp of shapes){
-      const xfrm = sp.getElementsByTagName('a:off')[0];
-      const ext = sp.getElementsByTagName('a:ext')[0];
-      let x=40,y=40,w=renderW-80,h=60;
-      if (xfrm && ext){
-        x = (+xfrm.getAttribute('x')) / state.pptxSlideSize.cx * renderW;
-        y = (+xfrm.getAttribute('y')) / state.pptxSlideSize.cy * renderH;
-        w = (+ext.getAttribute('cx')) / state.pptxSlideSize.cx * renderW;
-        h = (+ext.getAttribute('cy')) / state.pptxSlideSize.cy * renderH;
-      }
-      const paras = [...sp.getElementsByTagName('a:p')];
-      let ty = y + 4;
-      paras.forEach(par=>{
-        const runs = [...par.getElementsByTagName('a:t')];
-        const line = runs.map(r=>r.textContent).join('');
-        if (runs.length){
-          const rPr = par.getElementsByTagName('a:rPr')[0];
-          let fsz = Math.max(9, Math.min(48, (rPr && rPr.getAttribute('sz') ? (+rPr.getAttribute('sz'))/100 : 18) * (renderW/960) * 0.6));
-          ctx.fillStyle = '#1a1a1a';
-          ctx.font = `${fsz}px 'DM Sans', sans-serif`;
-          ctx.textBaseline = 'top';
-          wrapText(ctx, line, x+4, ty, w-8, fsz*1.25);
-          ty += fsz*1.4 + 6;
-        }
-      });
-    }
-    // text runs for the Text tab, taken strictly in doc order
-    const flatRuns = [...dom.getElementsByTagName('a:t')].map((node,idx)=>({ idx, text: node.textContent }));
-
-    state.pages.push({
-      baseCanvas: c, objects: [], width: renderW, height: renderH,
-      slideXml: xmlStr, slideRelPath: slideRef.relPath, textRuns: flatRuns
-    });
-  }
+  document.body.appendChild(p);
+  const r = anchor.getBoundingClientRect();
+  const w = p.offsetWidth, h = p.offsetHeight;
+  p.style.left = Math.max(8, Math.min(r.left, innerWidth - w - 8)) + 'px';
+  p.style.top = (r.bottom + 6 + h > innerHeight ? Math.max(8, r.top - h - 6) : r.bottom + 6) + 'px';
 }
-function wrapText(ctx, text, x, y, maxWidth, lineHeight){
-  const words = text.split(' ');
-  let line = '';
-  for (let n=0;n<words.length;n++){
-    const test = line + words[n] + ' ';
-    if (ctx.measureText(test).width > maxWidth && n>0){
-      ctx.fillText(line, x, y);
-      line = words[n] + ' ';
-      y += lineHeight;
-    } else { line = test; }
-  }
-  ctx.fillText(line, x, y);
+document.addEventListener('mousedown', e => { if (!e.target.closest('.popover')) document.querySelectorAll('.popover').forEach(p => p.remove()); });
+
+/* ------------------------------ backend (GAS) ------------------------------ */
+async function gas(payload) {
+  if (!GAS_ON) throw new Error('The mail backend (Apps Script) is not configured.');
+  const idToken = await auth.currentUser.getIdToken();
+  const r = await fetch(GAS_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ ...payload, idToken }) });
+  if (!r.ok) throw new Error('Backend error (' + r.status + ')');
+  const j = await r.json();
+  if (!j.ok) throw new Error(j.error || 'Backend error');
+  return j;
 }
 
-/* ============================================================
-   RENDER / REDRAW
-   ============================================================ */
-function renderCurrentPage(){
-  const pg = state.pages[state.currentPage];
-  if (!pg) return;
-  const w = pg.width, h = pg.height;
-  baseCanvas.width = w; baseCanvas.height = h;
-  overlayCanvas.width = w; overlayCanvas.height = h;
-  canvasHolder.style.width = w+'px'; canvasHolder.style.height = h+'px';
-  applyZoomStyle();
-  baseCtx.clearRect(0,0,w,h);
-  baseCtx.drawImage(pg.baseCanvas,0,0);
-  redrawOverlay();
+/* -------------------------------- auth -------------------------------- */
+let authMode = 'in';
+function setAuthMode(m) {
+  authMode = m;
+  $('#tabIn').classList.toggle('on', m === 'in'); $('#tabUp').classList.toggle('on', m === 'up');
+  $('#nameFld').hidden = m !== 'up';
+  $('#authBtn').textContent = m === 'in' ? 'Sign in' : 'Create account';
+  $('#aPass').autocomplete = m === 'in' ? 'current-password' : 'new-password';
+  $('#authErr').textContent = '';
 }
-function applyZoomStyle(){
-  canvasHolder.style.transform = `scale(${state.zoom})`;
-  canvasHolder.style.transformOrigin = 'center center';
+function authMsg(err) {
+  const c = err && err.code || '';
+  if (c === 'auth/email-already-in-use') return 'That username is already taken.';
+  if (['auth/invalid-credential', 'auth/user-not-found', 'auth/wrong-password', 'auth/invalid-login-credentials'].includes(c)) return 'Incorrect username or password.';
+  if (c === 'auth/weak-password') return 'Choose a stronger password (8+ characters).';
+  if (c === 'auth/too-many-requests') return 'Too many attempts. Try again in a few minutes.';
+  if (c === 'auth/network-request-failed') return 'Network error. Check your connection.';
+  if (c === 'auth/operation-not-allowed') return 'Enable Email/Password sign-in in Firebase Authentication.';
+  return err && err.message ? err.message : 'Something went wrong.';
 }
-function redrawOverlay(){
-  const pg = state.pages[state.currentPage];
-  if (!pg) return;
-  octx.clearRect(0,0,overlayCanvas.width, overlayCanvas.height);
-  pg.objects.forEach(obj => drawObject(octx, obj, obj.id===state.selectedObjectId));
-  if (dragState && dragState.previewObj) drawObject(octx, dragState.previewObj, false);
-  if (dragState && dragState.cropRect) drawCropRect(octx, dragState.cropRect);
+function normUser(v) {
+  v = v.trim().toLowerCase();
+  if (v.includes('@')) { if (!v.endsWith('@' + MAIL_DOMAIN)) throw new Error('Use your @' + MAIL_DOMAIN + ' address or just the username.'); v = v.split('@')[0]; }
+  if (!USER_RE.test(v)) throw new Error('Username: 3–30 characters, letters, numbers, dots or underscores.');
+  return v;
 }
-function drawObject(ctx, obj, selected){
-  ctx.save();
-  ctx.strokeStyle = obj.color; ctx.fillStyle = obj.color;
-  ctx.lineWidth = obj.strokeWidth || 4;
-  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-  if (obj.type === 'path'){
-    ctx.globalAlpha = obj.alpha ?? 1;
-    const hasPressure = obj.points.some(p => p.pressure !== undefined && p.pressure !== 1);
-    if (hasPressure){
-      // Variable-width stroke: draw short segments, each sized by that point's pressure.
-      const base = obj.strokeWidth || 4;
-      for (let i=1;i<obj.points.length;i++){
-        const p0 = obj.points[i-1], p1 = obj.points[i];
-        ctx.lineWidth = Math.max(0.75, base * (p1.pressure ?? 1));
-        ctx.beginPath();
-        ctx.moveTo(p0.x,p0.y);
-        ctx.lineTo(p1.x,p1.y);
-        ctx.stroke();
-      }
-    } else {
-      ctx.beginPath();
-      obj.points.forEach((p,i)=> i===0 ? ctx.moveTo(p.x,p.y) : ctx.lineTo(p.x,p.y));
-      ctx.stroke();
-    }
-  } else if (obj.type === 'highlight'){
-    ctx.globalAlpha = 0.35;
-    ctx.lineWidth = obj.strokeWidth || 18;
-    ctx.beginPath();
-    obj.points.forEach((p,i)=> i===0 ? ctx.moveTo(p.x,p.y) : ctx.lineTo(p.x,p.y));
-    ctx.stroke();
-  } else if (obj.type === 'rect'){
-    ctx.strokeRect(obj.x, obj.y, obj.w, obj.h);
-  } else if (obj.type === 'ellipse'){
-    ctx.beginPath();
-    ctx.ellipse(obj.x+obj.w/2, obj.y+obj.h/2, Math.abs(obj.w/2), Math.abs(obj.h/2), 0, 0, Math.PI*2);
-    ctx.stroke();
-  } else if (obj.type === 'line'){
-    ctx.beginPath(); ctx.moveTo(obj.x, obj.y); ctx.lineTo(obj.x2, obj.y2); ctx.stroke();
-  } else if (obj.type === 'arrow'){
-    drawArrow(ctx, obj.x, obj.y, obj.x2, obj.y2, obj.strokeWidth||4);
-  } else if (obj.type === 'text'){
-    ctx.font = `${obj.fontSize}px 'DM Sans', sans-serif`;
-    ctx.textBaseline = 'top';
-    (obj.text||'').split('\n').forEach((line,i)=> ctx.fillText(line, obj.x, obj.y + i*obj.fontSize*1.25));
-  } else if (obj.type === 'image'){
-    if (obj.img) ctx.drawImage(obj.img, obj.x, obj.y, obj.w, obj.h);
-  }
-  ctx.restore();
-  if (selected) drawSelectionBox(ctx, obj);
-}
-function drawArrow(ctx,x1,y1,x2,y2,width){
-  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-  const angle = Math.atan2(y2-y1, x2-x1);
-  const headLen = 8 + width*2;
-  ctx.beginPath();
-  ctx.moveTo(x2,y2);
-  ctx.lineTo(x2 - headLen*Math.cos(angle-Math.PI/6), y2 - headLen*Math.sin(angle-Math.PI/6));
-  ctx.lineTo(x2 - headLen*Math.cos(angle+Math.PI/6), y2 - headLen*Math.sin(angle+Math.PI/6));
-  ctx.closePath(); ctx.fill();
-}
-function getBBox(obj){
-  if (obj.type==='path' || obj.type==='highlight'){
-    const xs = obj.points.map(p=>p.x), ys = obj.points.map(p=>p.y);
-    return {x:Math.min(...xs), y:Math.min(...ys), w:Math.max(...xs)-Math.min(...xs), h:Math.max(...ys)-Math.min(...ys)};
-  }
-  if (obj.type==='line' || obj.type==='arrow'){
-    return {x:Math.min(obj.x,obj.x2), y:Math.min(obj.y,obj.y2), w:Math.abs(obj.x2-obj.x), h:Math.abs(obj.y2-obj.y)};
-  }
-  if (obj.type==='text'){
-    const lines = (obj.text||'').split('\n');
-    octx.font = `${obj.fontSize}px 'DM Sans', sans-serif`;
-    const w = Math.max(...lines.map(l=>octx.measureText(l).width), 20);
-    return {x:obj.x, y:obj.y, w, h: lines.length*obj.fontSize*1.25};
-  }
-  return {x:obj.x, y:obj.y, w:obj.w, h:obj.h};
-}
-function drawSelectionBox(ctx, obj){
-  const b = getBBox(obj);
-  ctx.save();
-  ctx.strokeStyle = '#5ee0c1'; ctx.setLineDash([5,4]); ctx.lineWidth = 1.5;
-  ctx.strokeRect(b.x-4, b.y-4, b.w+8, b.h+8);
-  ctx.setLineDash([]);
-  ctx.fillStyle = '#5ee0c1';
-  [[b.x-4,b.y-4],[b.x+b.w+4,b.y-4],[b.x-4,b.y+b.h+4],[b.x+b.w+4,b.y+b.h+4]].forEach(([hx,hy])=>{
-    ctx.fillRect(hx-3, hy-3, 6, 6);
-  });
-  ctx.restore();
-}
-function drawCropRect(ctx, r){
-  ctx.save();
-  ctx.strokeStyle = '#5ee0c1'; ctx.lineWidth = 2; ctx.setLineDash([6,4]);
-  ctx.strokeRect(r.x, r.y, r.w, r.h);
-  ctx.setLineDash([]);
-  ctx.fillStyle = '#00000088';
-  ctx.fillRect(0,0,overlayCanvas.width, r.y);
-  ctx.fillRect(0,r.y+r.h,overlayCanvas.width, overlayCanvas.height-r.y-r.h);
-  ctx.fillRect(0,r.y,r.x,r.h);
-  ctx.fillRect(r.x+r.w,r.y,overlayCanvas.width-r.x-r.w,r.h);
-  ctx.restore();
-}
-
-/* ============================================================
-   POINTER INTERACTIONS
-   ============================================================ */
-function canvasPoint(e){
-  const rect = overlayCanvas.getBoundingClientRect();
-  const scaleX = overlayCanvas.width / rect.width;
-  const scaleY = overlayCanvas.height / rect.height;
-  return { x: (e.clientX-rect.left)*scaleX, y: (e.clientY-rect.top)*scaleY };
-}
-function getSelectedObject(){
-  const pg = state.pages[state.currentPage];
-  if (!pg) return null;
-  return pg.objects.find(o=>o.id===state.selectedObjectId) || null;
-}
-function hitTest(pt){
-  const pg = state.pages[state.currentPage];
-  for (let i=pg.objects.length-1; i>=0; i--){
-    const obj = pg.objects[i];
-    const b = getBBox(obj);
-    if (pt.x >= b.x-6 && pt.x <= b.x+b.w+6 && pt.y >= b.y-6 && pt.y <= b.y+b.h+6) return obj;
-  }
-  return null;
-}
-
-overlayCanvas.addEventListener('pointerdown', e=>{
-  if (!state.pages.length) return;
-  // Ignore a second simultaneous contact point (extra finger, palm) while one
-  // pointer is already drawing/dragging — keeps multi-touch from producing
-  // stray strokes or hijacking an in-progress interaction.
-  if (activePointerId !== null && e.pointerId !== activePointerId) return;
-  if (e.pointerType === 'touch' && !e.isPrimary) return;
-
-  activePointerId = e.pointerId;
-  overlayCanvas.setPointerCapture(e.pointerId);
-  e.preventDefault();
-  const pt = canvasPoint(e);
-  const pressure = pointerPressure(e);
-  const tool = state.tool;
-
-  if (tool === 'select'){
-    const hit = hitTest(pt);
-    state.selectedObjectId = hit ? hit.id : null;
-    if (hit){
-      dragState = { mode:'move', obj:hit, start:pt, origX:hit.x, origY:hit.y, origPoints: hit.points ? hit.points.map(p=>({...p})) : null, origX2:hit.x2, origY2:hit.y2 };
-    }
-    buildLeftPanel();
-    syncMenuState();
-    redrawOverlay();
-    return;
-  }
-  if (tool === 'eraser'){
-    const hit = hitTest(pt);
-    if (hit){
-      const pg = state.pages[state.currentPage];
-      pg.objects = pg.objects.filter(o=>o.id!==hit.id);
-      commitHistory(); redrawOverlay();
-    }
-    return;
-  }
-  if (tool === 'pen' || tool === 'highlight'){
-    dragState = { mode:'draw-path', points:[{...pt, pressure}], type: tool==='highlight' ? 'highlight':'path' };
-    return;
-  }
-  if (['rect','ellipse','line','arrow'].includes(tool)){
-    dragState = { mode:'draw-shape', type: tool, start: pt };
-    return;
-  }
-  if (tool === 'crop'){
-    dragState = { mode:'crop', start: pt, cropRect: {x:pt.x,y:pt.y,w:0,h:0} };
-    return;
-  }
-  if (tool === 'text'){
-    createTextObject(pt);
-    return;
-  }
-});
-
-overlayCanvas.addEventListener('pointermove', e=>{
-  if (!dragState) return;
-  if (activePointerId !== null && e.pointerId !== activePointerId) return;
-  e.preventDefault();
-  const pt = canvasPoint(e);
-  const pressure = pointerPressure(e);
-  if (dragState.mode === 'move'){
-    const dx = pt.x - dragState.start.x, dy = pt.y - dragState.start.y;
-    const obj = dragState.obj;
-    if (dragState.origPoints){
-      obj.points = dragState.origPoints.map(p=>({x:p.x+dx, y:p.y+dy}));
-    } else if (obj.x2 !== undefined){
-      obj.x = dragState.origX+dx; obj.y = dragState.origY+dy;
-      obj.x2 = dragState.origX2+dx; obj.y2 = dragState.origY2+dy;
-    } else {
-      obj.x = dragState.origX+dx; obj.y = dragState.origY+dy;
-    }
-    redrawOverlay();
-  } else if (dragState.mode === 'draw-path'){
-    dragState.points.push({...pt, pressure});
-    dragState.previewObj = { type: dragState.type, points: dragState.points, color: state.color, strokeWidth: state.strokeWidth };
-    redrawOverlay();
-  } else if (dragState.mode === 'draw-shape'){
-    const s = dragState.start;
-    if (dragState.type==='rect' || dragState.type==='ellipse'){
-      dragState.previewObj = { type:dragState.type, x:Math.min(s.x,pt.x), y:Math.min(s.y,pt.y), w:Math.abs(pt.x-s.x), h:Math.abs(pt.y-s.y), color: state.color, strokeWidth: state.strokeWidth };
-    } else {
-      dragState.previewObj = { type:dragState.type, x:s.x, y:s.y, x2:pt.x, y2:pt.y, color: state.color, strokeWidth: state.strokeWidth };
-    }
-    redrawOverlay();
-  } else if (dragState.mode === 'crop'){
-    const s = dragState.start;
-    dragState.cropRect = { x:Math.min(s.x,pt.x), y:Math.min(s.y,pt.y), w:Math.abs(pt.x-s.x), h:Math.abs(pt.y-s.y) };
-    redrawOverlay();
-  }
-});
-
-window.addEventListener('pointerup', e=>{
-  if (activePointerId !== null && e.pointerId === activePointerId) activePointerId = null;
-  if (!dragState) return;
-  const pg = state.pages[state.currentPage];
-  if (dragState.mode === 'move'){
-    commitHistory();
-  } else if (dragState.mode === 'draw-path' && dragState.points.length>1){
-    pg.objects.push({ id:newId(), type: dragState.type, points: dragState.points, color: state.color, strokeWidth: state.strokeWidth });
-    commitHistory();
-  } else if (dragState.mode === 'draw-shape' && dragState.previewObj){
-    const o = dragState.previewObj; o.id = newId();
-    pg.objects.push(o);
-    commitHistory();
-  } else if (dragState.mode === 'crop'){
-    // keep cropRect active until Enter/Esc
-    dragState.finalized = true;
-    redrawOverlay();
-    return;
-  }
-  dragState = null;
-  redrawOverlay();
-});
-
-window.addEventListener('pointercancel', e=>{
-  if (activePointerId !== null && e.pointerId === activePointerId) activePointerId = null;
-  dragState = null;
-  redrawOverlay();
-});
-
-window.addEventListener('keydown', e=>{
-  if (e.key === 'Enter' && dragState && dragState.mode==='crop' && dragState.cropRect){
-    applyCrop(dragState.cropRect);
-    dragState = null;
-    setTool('select');
-  } else if (e.key === 'Escape' && dragState && dragState.mode==='crop'){
-    dragState = null; redrawOverlay();
-  } else if ((e.key==='Delete' || e.key==='Backspace') && state.tool==='select' && state.selectedObjectId && document.activeElement===document.body){
-    deleteSelectedObject();
-  } else if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='s'){
+function wireAuth() {
+  $('#aDomain').textContent = '@' + MAIL_DOMAIN;
+  $('#cfgWarn').hidden = CFG_OK;
+  $('#tabIn').onclick = () => setAuthMode('in'); $('#tabUp').onclick = () => setAuthMode('up');
+  $('#authForm').addEventListener('submit', async e => {
     e.preventDefault();
-    if (state.pages.length){ saveCurrentProject().then(()=>toast('Saved')); }
-  } else if ((e.ctrlKey||e.metaKey) && e.key==='z' && !e.shiftKey){
-    e.preventDefault(); undo();
-  } else if ((e.ctrlKey||e.metaKey) && (e.key==='y' || (e.key==='z'&&e.shiftKey))){
-    e.preventDefault(); redo();
-  } else if (!isTypingTarget(e.target)) {
-    const map = {v:'select', p:'pen', t:'text', r:'rect', o:'ellipse', l:'line', a:'arrow', h:'highlight', e:'eraser', c:'crop'};
-    if (map[e.key.toLowerCase()]) setTool(map[e.key.toLowerCase()]);
+    const err = $('#authErr'), btn = $('#authBtn'); err.textContent = '';
+    if (!CFG_OK) { err.textContent = 'Firebase is not configured.'; return; }
+    btn.disabled = true;
+    try {
+      const username = normUser($('#aUser').value), pw = $('#aPass').value, addr = username + '@' + MAIL_DOMAIN;
+      if (authMode === 'in') {
+        await signInWithEmailAndPassword(auth, addr, pw);
+      } else {
+        const name = $('#aName').value.trim();
+        if (!name) throw new Error('Enter your full name.');
+        if (pw.length < 8) throw new Error('Password must be at least 8 characters.');
+        state.signingUp = true;
+        let cred;
+        try { cred = await createUserWithEmailAndPassword(auth, addr, pw); } catch (x) { state.signingUp = false; throw x; }
+        try {
+          const b = writeBatch(db);
+          b.set(doc(db, 'usernames', username), { uid: cred.user.uid, createdAt: serverTimestamp() });
+          b.set(doc(db, 'users', cred.user.uid), { username, address: addr, displayName: name, signature: '', labels: [], theme: 'light', density: 'comfortable', createdAt: serverTimestamp() });
+          await b.commit();
+          updateProfile(cred.user, { displayName: name }).catch(() => { });
+        } catch (x) {
+          console.error(x);
+          await deleteUser(cred.user).catch(() => { });
+          state.signingUp = false;
+          throw new Error('Could not create the account. Check your Firestore rules and try again.');
+        }
+        state.signingUp = false;
+        await boot(auth.currentUser);
+      }
+    } catch (x) { err.textContent = authMsg(x); }
+    btn.disabled = false;
+  });
+}
+
+async function boot(user) {
+  state.user = user;
+  const snap = await getDoc(doc(db, 'users', user.uid));
+  if (!snap.exists()) { await signOut(auth); $('#auth').hidden = false; $('#authErr').textContent = 'This account has no mailbox profile. Create the account again.'; return; }
+  state.profile = snap.data();
+  $('#auth').hidden = true; $('#app').hidden = false;
+  applyPrefs(); renderChrome();
+  state.unsubProfile = onSnapshot(doc(db, 'users', user.uid), s => { if (s.exists()) { state.profile = s.data(); applyPrefs(); renderChrome(); renderAll(); } });
+  startMails();
+  if (!state.bound) { bindGlobal(); state.bound = true; }
+}
+function startMails() {
+  state.unsubMails && state.unsubMails();
+  state.loaded = false;
+  const q = query(collection(db, 'users', me(), 'mails'), orderBy('ts', 'desc'), limit(state.limit));
+  state.unsubMails = onSnapshot(q, snap => {
+    const first = !state.loaded;
+    state.mails = snap.docs.map(normMail).sort((a, b) => b.t - a.t);
+    state.loaded = true;
+    if (!first) snap.docChanges().forEach(ch => {
+      if (ch.type === 'added' && !ch.doc.metadata.hasPendingWrites) { const m = normMail(ch.doc); if (m.folder === 'inbox' && !m.read && m.from.uid !== me()) notifyNew(m); }
+    });
+    const keys = new Set(state.mails.map(keyOf)); state.selected.forEach(k => { if (!keys.has(k)) state.selected.delete(k); });
+    renderAll();
+  }, err => { console.error(err); toast('Could not load mail: ' + err.message, { error: true, ms: 7000 }); });
+}
+function notifyNew(m) {
+  toast('New mail from ' + (m.from.name || m.from.address), { ms: 5000 });
+  if ('Notification' in window && Notification.permission === 'granted' && document.hidden) new Notification(m.from.name || m.from.address, { body: m.subject });
+}
+function applyPrefs() {
+  const p = state.profile || {};
+  document.documentElement.dataset.theme = p.theme === 'dark' ? 'dark' : 'light';
+  document.body.classList.toggle('compact', p.density === 'compact');
+}
+
+/* ------------------------------ queries ------------------------------ */
+function scope(m, view) {
+  const f = m.folder;
+  switch (view) {
+    case 'inbox': return f === 'inbox';
+    case 'starred': return m.starred && f !== 'trash' && f !== 'spam';
+    case 'sent': return f === 'sent';
+    case 'drafts': return f === 'drafts';
+    case 'spam': return f === 'spam';
+    case 'trash': return f === 'trash';
+    case 'all': return f !== 'trash' && f !== 'spam';
+    default: return view.startsWith('label:') ? m.labels.includes(view.slice(6)) && f !== 'trash' && f !== 'spam' : false;
   }
-});
-function isTypingTarget(el){ return el.tagName==='TEXTAREA' || el.tagName==='INPUT' || el.isContentEditable; }
-
-function deleteSelectedObject(){
-  const pg = state.pages[state.currentPage];
-  pg.objects = pg.objects.filter(o=>o.id!==state.selectedObjectId);
-  state.selectedObjectId = null;
-  commitHistory(); buildLeftPanel(); redrawOverlay();
 }
-
-function createTextObject(pt){
-  const pg = state.pages[state.currentPage];
-  const obj = { id:newId(), type:'text', x:pt.x, y:pt.y, text:'Text', color: state.color, fontSize: state.fontSize };
-  pg.objects.push(obj);
-  state.selectedObjectId = obj.id;
-  commitHistory();
-  redrawOverlay();
-  openInlineTextEditor(obj);
-}
-function openInlineTextEditor(obj){
-  const rect = overlayCanvas.getBoundingClientRect();
-  const scaleX = rect.width / overlayCanvas.width;
-  const scaleY = rect.height / overlayCanvas.height;
-  const box = document.createElement('textarea');
-  box.className = 'text-edit-box';
-  box.style.left = (rect.left + obj.x*scaleX) + 'px';
-  box.style.top = (rect.top + obj.y*scaleY) + 'px';
-  box.style.width = Math.max(120, 240*scaleX) + 'px';
-  box.style.height = (obj.fontSize*1.5*scaleY) + 'px';
-  box.style.fontSize = (obj.fontSize*scaleY) + 'px';
-  box.style.color = obj.color;
-  box.value = obj.text === 'Text' ? '' : obj.text;
-  box.placeholder = 'Type…';
-  document.body.appendChild(box);
-  box.focus();
-  const finish = () => {
-    obj.text = box.value || 'Text';
-    document.body.removeChild(box);
-    commitHistory();
-    redrawOverlay();
-  };
-  box.addEventListener('blur', finish);
-  box.addEventListener('keydown', ev=>{ if (ev.key==='Enter' && !ev.shiftKey){ ev.preventDefault(); box.blur(); } });
-}
-overlayCanvas.addEventListener('dblclick', e=>{
-  const pt = canvasPoint(e);
-  const hit = hitTest(pt);
-  if (hit && hit.type==='text'){ state.selectedObjectId = hit.id; openInlineTextEditor(hit); }
-});
-
-function triggerImageInsert(){
-  const inp = document.createElement('input');
-  inp.type = 'file'; inp.accept = 'image/*';
-  inp.onchange = () => {
-    const f = inp.files[0]; if (!f) return;
-    const img = new Image();
-    img.onload = () => {
-      const pg = state.pages[state.currentPage];
-      const w = Math.min(pg.width*0.4, img.naturalWidth);
-      const h = w * (img.naturalHeight/img.naturalWidth);
-      const obj = { id:newId(), type:'image', x:pg.width/2-w/2, y:pg.height/2-h/2, w, h, img, color:'#000' };
-      pg.objects.push(obj);
-      state.selectedObjectId = obj.id;
-      setTool('select');
-      commitHistory(); redrawOverlay();
-    };
-    img.src = URL.createObjectURL(f);
-  };
-  inp.click();
-}
-
-/* ============================================================
-   CROP
-   ============================================================ */
-function applyCrop(r){
-  if (r.w<4 || r.h<4) return;
-  const pg = state.pages[state.currentPage];
-  const c = document.createElement('canvas');
-  c.width = r.w; c.height = r.h;
-  c.getContext('2d').drawImage(pg.baseCanvas, r.x, r.y, r.w, r.h, 0, 0, r.w, r.h);
-  pg.baseCanvas = c;
-  pg.width = r.w; pg.height = r.h;
-  pg.objects = pg.objects.filter(o=>{
-    const b = getBBox(o);
-    return b.x >= r.x-2 && b.y >= r.y-2 && b.x+b.w <= r.x+r.w+2 && b.y+b.h <= r.y+r.h+2;
-  }).map(o=>{
-    o = {...o};
-    if (o.points) o.points = o.points.map(p=>({x:p.x-r.x, y:p.y-r.y}));
-    else { o.x -= r.x; o.y -= r.y; if (o.x2!==undefined){o.x2-=r.x; o.y2-=r.y;} }
-    return o;
+function parseQuery(q) {
+  const f = { text: [], from: [], to: [], subject: [], label: [], is: [], has: [], in: null };
+  (q.match(/(?:[^\s"]+:"[^"]*"|"[^"]*"|\S+)/g) || []).forEach(tok => {
+    const m = /^(from|to|subject|label|is|has|in):(.+)$/i.exec(tok);
+    const strip = s => s.replace(/^"|"$/g, '').toLowerCase();
+    if (m) { const k = m[1].toLowerCase(), v = strip(m[2]); if (k === 'in') f.in = v; else f[k].push(v); } else f.text.push(strip(tok));
   });
-  commitHistory();
-  renderCurrentPage();
-  buildPagesTab();
-  toast('Page cropped');
+  return f;
 }
+function matches(m, f) {
+  if (f.in) { if (f.in !== 'anywhere' && !scope(m, f.in)) return false; } else if (m.folder === 'trash' || m.folder === 'spam') return false;
+  const from = (m.from.name + ' ' + m.from.address).toLowerCase();
+  const to = [...m.to, ...m.cc].join(' ').toLowerCase();
+  if (!f.from.every(v => from.includes(v))) return false;
+  if (!f.to.every(v => to.includes(v))) return false;
+  if (!f.subject.every(v => (m.subject || '').toLowerCase().includes(v))) return false;
+  for (const v of f.label) { const l = (state.profile.labels || []).find(x => x.name.toLowerCase() === v); if (!l || !m.labels.includes(l.id)) return false; }
+  for (const v of f.is) { if (v === 'unread' && m.read) return false; if (v === 'read' && !m.read) return false; if (v === 'starred' && !m.starred) return false; }
+  if (f.has.includes('attachment') && !m.attachments.length) return false;
+  const hay = (m.subject + ' ' + m.snippet + ' ' + from + ' ' + to).toLowerCase();
+  return f.text.every(v => hay.includes(v));
+}
+const viewMails = () => { const f = state.query.trim() ? parseQuery(state.query) : null; return state.mails.filter(m => f ? matches(m, f) : scope(m, state.view)); };
+function buildThreads(list) {
+  const map = new Map();
+  for (const m of list) {
+    const k = keyOf(m); let t = map.get(k);
+    if (!t) { t = { key: k, latest: m, mails: [m], unread: !m.read, starred: m.starred }; map.set(k, t); }
+    else { t.mails.push(m); if (!m.read) t.unread = true; if (m.starred) t.starred = true; }
+  }
+  return [...map.values()];
+}
+const contacts = () => {
+  const map = new Map();
+  for (const m of state.mails) {
+    if (m.from.address && m.from.uid !== me()) map.set(m.from.address, m.from.name || '');
+    [...m.to, ...m.cc].forEach(a => { if (!map.has(a)) map.set(a, ''); });
+  }
+  map.delete(state.profile.address); return map;
+};
+const shortAddr = a => { const n = contacts().get(a); return n || a.split('@')[0]; };
 
-/* ============================================================
-   PAGES TAB
-   ============================================================ */
-function buildPagesTab(){
-  const tab = $('#tab-pages');
-  if (!state.pages.length){ tab.innerHTML = `<p class="hint">No pages yet.</p>`; return; }
-  const label = state.fileType==='pptx' ? 'Slide' : 'Page';
-  tab.innerHTML = `<div class="btn-row" style="margin-bottom:10px;">
-      <button class="btn-sm" id="page-add">+ ${state.fileType==='pptx'?'Duplicate current':'New blank'}</button>
-    </div>` +
-    state.pages.map((pg,i)=>`
-    <div class="page-card ${i===state.currentPage?'active':''}" data-idx="${i}">
-      <div class="page-thumb"><img src="${pg.baseCanvas.toDataURL()}"></div>
-      <div class="page-meta"><div class="pnum">${label} ${i+1}</div><div class="pdesc">${pg.objects.length} annotation${pg.objects.length!==1?'s':''}</div></div>
-      <div class="page-actions">
-        <button class="icon-btn" data-act="up" title="Move up">${svgIcon('up')}</button>
-        <button class="icon-btn" data-act="down" title="Move down">${svgIcon('down')}</button>
-        <button class="icon-btn" data-act="rotate" title="Rotate 90°">${svgIcon('rotate')}</button>
-        <button class="icon-btn" data-act="del" title="Delete">${svgIcon('trash')}</button>
-      </div>
-    </div>`).join('');
+/* ------------------------------ rendering ------------------------------ */
+const FOLDERS = [['inbox', 'inbox', 'Inbox'], ['starred', 'star', 'Starred'], ['sent', 'send', 'Sent'], ['drafts', 'file', 'Drafts'], ['all', 'mail', 'All Mail'], ['spam', 'spam', 'Spam'], ['trash', 'trash', 'Trash']];
+function renderChrome() {
+  $('#menuBtn').innerHTML = ic('menu'); $('#searchIc').innerHTML = ic('search', 18);
+  $('#clearSearch').innerHTML = ic('x', 16); $('#setBtn').innerHTML = ic('sliders');
+  $('#themeBtn').innerHTML = ic(document.documentElement.dataset.theme === 'dark' ? 'sun' : 'moon');
+  $('#userBtn').innerHTML = avatar(state.profile.displayName, 34);
+  $('.top-brand .logo').innerHTML = ic('mail', 18).replace('class="ic"', 'class="ic" style="color:#fff"');
+}
+function renderAll() { renderSidebar(); renderMain(); }
+function renderSidebar() {
+  const unread = state.mails.filter(m => m.folder === 'inbox' && !m.read).length;
+  const drafts = state.mails.filter(m => m.folder === 'drafts').length;
+  const spamUnread = state.mails.filter(m => m.folder === 'spam' && !m.read).length;
+  const cnt = k => k === 'inbox' ? unread : k === 'drafts' ? drafts : k === 'spam' ? spamUnread : 0;
+  document.title = (unread ? `(${unread}) ` : '') + 'Pro Mail';
+  const labels = (state.profile.labels || []).map(l => {
+    const n = state.mails.filter(m => m.labels.includes(l.id) && !m.read && m.folder !== 'trash' && m.folder !== 'spam').length;
+    return `<button class="nav ${state.view === 'label:' + l.id ? 'on' : ''}" data-act="nav" data-view="label:${esc(l.id)}"><span class="dot" style="background:${esc(l.color)}"></span><span>${esc(l.name)}</span><span class="x" data-act="dellabel" data-id="${esc(l.id)}" title="Delete label">${ic('x', 14)}</span>${n ? `<span class="n">${n}</span>` : ''}</button>`;
+  }).join('');
+  $('#sidebar').innerHTML = `<button class="compose-btn" data-act="compose">${ic('plus', 22)}Compose</button>` +
+    FOLDERS.map(([k, i, n]) => `<button class="nav ${state.view === k && !state.query ? 'on' : ''}" data-act="nav" data-view="${k}">${ic(i, 18)}<span>${n}</span>${cnt(k) ? `<span class="n">${cnt(k)}</span>` : ''}</button>`).join('') +
+    `<div class="side-h"><span>Labels</span><button class="icon-btn sm" data-act="newlabel" title="Create label">${ic('plus', 16)}</button></div>${labels || '<div style="margin:6px 0 0 28px;color:var(--muted);font-size:12px">No labels yet</div>'}`;
+}
+function viewTitle() {
+  if (state.query) return 'Search results';
+  if (state.view.startsWith('label:')) { const l = (state.profile.labels || []).find(x => x.id === state.view.slice(6)); return l ? l.name : 'Label'; }
+  return (FOLDERS.find(f => f[0] === state.view) || [0, 0, 'Mail'])[2];
+}
+function renderMain() { $('#main').innerHTML = state.openKey ? renderReader() : renderList(); }
 
-  tab.querySelectorAll('.page-card').forEach(card=>{
-    card.addEventListener('click', e=>{
-      if (e.target.closest('.icon-btn')) return;
-      state.currentPage = +card.dataset.idx;
-      state.selectedObjectId = null;
-      renderCurrentPage(); buildPagesTab(); buildTextTab(); updateStatus();
-    });
-  });
-  tab.querySelectorAll('.icon-btn').forEach(btn=>{
-    btn.addEventListener('click', e=>{
-      e.stopPropagation();
-      const idx = +btn.closest('.page-card').dataset.idx;
-      const act = btn.dataset.act;
-      if (act==='del') deletePage(idx);
-      if (act==='up') movePage(idx,-1);
-      if (act==='down') movePage(idx,1);
-      if (act==='rotate') rotatePage(idx);
-    });
-  });
-  const addBtn = $('#page-add');
-  if (addBtn) addBtn.onclick = () => addOrDuplicatePage();
-}
-function deletePage(idx){
-  if (state.pages.length<=1){ toast("Can't delete the only page"); return; }
-  state.pages.splice(idx,1);
-  if (state.currentPage>=state.pages.length) state.currentPage = state.pages.length-1;
-  renderCurrentPage(); buildPagesTab(); buildTextTab(); updateStatus();
-  scheduleSave();
-}
-function movePage(idx, dir){
-  const j = idx+dir;
-  if (j<0 || j>=state.pages.length) return;
-  [state.pages[idx], state.pages[j]] = [state.pages[j], state.pages[idx]];
-  if (state.currentPage===idx) state.currentPage=j; else if (state.currentPage===j) state.currentPage=idx;
-  renderCurrentPage(); buildPagesTab();
-  scheduleSave();
-}
-function rotatePage(idx){
-  const pg = state.pages[idx];
-  const c = document.createElement('canvas');
-  c.width = pg.height; c.height = pg.width;
-  const ctx = c.getContext('2d');
-  ctx.translate(c.width/2, c.height/2);
-  ctx.rotate(Math.PI/2);
-  ctx.drawImage(pg.baseCanvas, -pg.width/2, -pg.height/2);
-  pg.baseCanvas = c;
-  const oldW = pg.width, oldH = pg.height;
-  pg.width = c.width; pg.height = c.height;
-  pg.objects = pg.objects.map(o=>{
-    o = {...o};
-    const rot = (x,y)=>({x: oldH - y, y: x});
-    if (o.points) o.points = o.points.map(p=>rot(p.x,p.y));
-    else {
-      const p1 = rot(o.x,o.y);
-      o.x = p1.x; o.y = p1.y;
-      if (o.x2!==undefined){ const p2=rot(o.x2,o.y2); o.x2=p2.x; o.y2=p2.y; }
-    }
-    return o;
-  });
-  commitHistory();
-  if (idx===state.currentPage) renderCurrentPage();
-  buildPagesTab();
-}
-function addOrDuplicatePage(){
-  const src = state.pages[state.currentPage];
-  const c = document.createElement('canvas');
-  c.width = src.width; c.height = src.height;
-  if (state.fileType==='pptx'){
-    c.getContext('2d').drawImage(src.baseCanvas,0,0);
+function renderList() {
+  state.threads = buildThreads(viewMails());
+  const th = state.threads, sel = state.selected;
+  const allSel = th.length > 0 && th.every(t => sel.has(t.key));
+  const isBin = (state.view === 'trash' || state.view === 'spam') && !state.query;
+  let tools;
+  if (sel.size) {
+    tools = `<input type="checkbox" class="chk" data-act="selall" ${allSel ? 'checked' : ''} style="margin:0 12px">` +
+      (isBin ? `<button class="btn" data-act="restore">${state.view === 'spam' ? 'Not spam' : 'Move to inbox'}</button><button class="btn danger" data-act="deleteforever" style="margin-left:6px">Delete forever</button>` :
+        `<button class="icon-btn" data-act="archive" title="Archive">${ic('archive')}</button><button class="icon-btn" data-act="spam" title="Report spam">${ic('spam')}</button><button class="icon-btn" data-act="trash" title="Delete">${ic('trash')}</button><button class="icon-btn" data-act="markread" title="Mark as read">${ic('check')}</button><button class="icon-btn" data-act="markunread" title="Mark as unread">${ic('mail')}</button><button class="icon-btn" data-act="labelmenu" title="Labels">${ic('tag')}</button>`) +
+      `<span class="info">${sel.size} selected</span>`;
   } else {
-    c.getContext('2d').fillStyle = '#ffffff';
-    c.getContext('2d').fillRect(0,0,c.width,c.height);
+    tools = `<input type="checkbox" class="chk" data-act="selall" ${allSel ? 'checked' : ''} style="margin:0 12px"><button class="icon-btn" data-act="refresh" title="Refresh">${ic('refresh')}</button>` +
+      (isBin && th.length ? `<button class="btn" data-act="emptyfolder" style="margin-left:6px">Delete all ${state.view === 'spam' ? 'spam' : 'bin'} messages now</button>` : '') +
+      `<span class="sp"></span><span class="info">${esc(viewTitle())}${th.length ? ' · ' + th.length : ''}</span>`;
   }
-  const newPg = { baseCanvas:c, objects:[], width:src.width, height:src.height };
-  if (state.fileType==='pptx'){
-    newPg.slideXml = src.slideXml; newPg.slideRelPath = null; // new slide, written on export
-    newPg.textRuns = src.textRuns ? src.textRuns.map(t=>({...t})) : [];
-    newPg.duplicateOf = src.slideRelPath;
+  const rows = th.map((t, i) => {
+    const m = t.latest, s = sel.has(t.key);
+    const lbls = uniq(t.mails.flatMap(x => x.labels)).map(id => (state.profile.labels || []).find(l => l.id === id)).filter(Boolean).slice(0, 3).map(l => `<span class="lbl" style="background:${esc(l.color)}">${esc(l.name)}</span>`).join('');
+    return `<div class="row ${t.unread ? 'unread' : ''} ${s ? 'sel' : ''} ${i === state.cursor ? 'cur' : ''}" data-act="open" data-id="${esc(t.key)}">
+      <input type="checkbox" class="chk" data-act="sel" data-id="${esc(t.key)}" ${s ? 'checked' : ''}>
+      <button class="star ${t.starred ? 'on' : ''}" data-act="tstar" data-id="${esc(t.key)}" title="Star">${ic('star', 18)}</button>
+      <div class="who">${whoLabel(t)}${t.mails.length > 1 ? `<span class="cnt">${t.mails.length}</span>` : ''}</div>
+      <div class="mid">${lbls}<span class="subj">${esc(m.subject || '(no subject)')}</span><span class="snip">– ${esc(m.snippet)}</span></div>
+      ${t.mails.some(x => x.attachments.length) ? `<span class="clip">${ic('clip', 16)}</span>` : ''}
+      <div class="when">${fmtList(m.t)}</div></div>`;
+  }).join('');
+  const empty = !state.loaded ? `<div class="empty"><div class="spin"></div></div>` :
+    `<div class="empty"><div><div class="big">${ic(state.query ? 'search' : 'inbox', 32)}</div><div style="font-size:16px;color:var(--text);font-weight:600">${state.query ? 'No messages match your search' : 'Nothing here'}</div><div>${state.query ? 'Try different keywords or operators.' : 'Messages in this view will appear here.'}</div></div></div>`;
+  const more = state.mails.length >= state.limit ? `<div class="list-foot"><button class="btn" data-act="more">Load older messages</button></div>` : '';
+  return `<div class="toolbar">${tools}</div><div class="list-scroll">${th.length ? rows + more : empty}</div>`;
+}
+function whoLabel(t) {
+  if (!state.query) {
+    if (state.view === 'sent') return 'To: ' + esc([...t.latest.to, ...t.latest.cc].map(shortAddr).join(', ') || '(no recipients)');
+    if (state.view === 'drafts') return '<span class="draft-tag">Draft</span>';
   }
-  state.pages.splice(state.currentPage+1, 0, newPg);
-  state.currentPage += 1;
-  commitHistory();
-  renderCurrentPage(); buildPagesTab(); buildTextTab(); updateStatus();
-  toast(state.fileType==='pptx' ? 'Slide duplicated' : 'Page added');
+  const names = [];
+  for (const m of t.mails.slice().reverse()) { const n = m.from.uid === me() ? 'me' : (m.from.name || m.from.address); if (!names.includes(n)) names.push(n); }
+  return esc(names.slice(-3).join(', '));
 }
 
-/* ============================================================
-   TEXT TAB (pptx text-run editing)
-   ============================================================ */
-function buildTextTab(){
-  const tab = $('#tab-text');
-  const pg = state.pages[state.currentPage];
-  if (state.fileType !== 'pptx'){
-    tab.innerHTML = `<p class="hint">Text editing of embedded content is available for PPTX files. For PDF and PNG, use the Text tool on the canvas to add new text on top of the page.</p>`;
-    return;
+function threadMails(key) {
+  return state.mails.filter(m => m.threadId === key && m.folder !== 'drafts' && (state.view === 'trash' ? m.folder === 'trash' : m.folder !== 'trash' && (m.folder !== 'spam' || state.view === 'spam'))).sort((a, b) => a.t - b.t);
+}
+function renderReader() {
+  const ms = threadMails(state.openKey);
+  if (!ms.length) { state.openKey = null; return renderList(); }
+  const last = ms[ms.length - 1];
+  const starred = ms.some(m => m.starred);
+  const lbls = uniq(ms.flatMap(m => m.labels)).map(id => (state.profile.labels || []).find(l => l.id === id)).filter(Boolean).map(l => `<span class="lbl" style="background:${esc(l.color)}">${esc(l.name)}</span>`).join('');
+  const isBin = state.view === 'trash' || state.view === 'spam';
+  const tools = `<button class="icon-btn" data-act="back" title="Back">${ic('back')}</button>` +
+    (isBin ? `<button class="icon-btn" data-act="restore" title="Move to inbox">${ic('inbox')}</button><button class="icon-btn" data-act="deleteforever" title="Delete forever">${ic('trash')}</button>` :
+      `<button class="icon-btn" data-act="archive" title="Archive">${ic('archive')}</button><button class="icon-btn" data-act="spam" title="Report spam">${ic('spam')}</button><button class="icon-btn" data-act="trash" title="Delete">${ic('trash')}</button><button class="icon-btn" data-act="markunread" title="Mark as unread">${ic('mail')}</button><button class="icon-btn" data-act="labelmenu" title="Labels">${ic('tag')}</button>`);
+  const body = ms.map((m, i) => {
+    const open = state.expanded.has(m.id) || i === ms.length - 1;
+    const mine = m.from.uid === me();
+    const atts = m.attachments.map(a => safeAttUrl(a.url) ? `<a class="att" href="${esc(a.url)}" target="_blank" rel="noopener noreferrer">${ic('clip', 16)}<span>${esc(a.name)}</span><small>${fmtSize(a.size || 0)}</small></a>` : `<span class="att">${ic('clip', 16)}<span>${esc(a.name)}</span></span>`).join('');
+    const ext = m.extStatus === 'failed' ? '<span class="tag bad">External delivery failed</span>' : m.extStatus === 'pending' ? '<span class="tag">Sending externally…</span>' : '';
+    return `<article class="msg ${open ? 'open' : ''}">
+      <div class="msg-head" data-act="togglemsg" data-id="${esc(m.id)}">${avatar(m.from.name || m.from.address, 40)}
+        <div class="meta"><div><span class="nm">${esc(mine ? 'me' : m.from.name || m.from.address)}</span><span class="ad">&lt;${esc(m.from.address)}&gt;</span> ${ext}</div>
+          <div class="to">to ${esc([...m.to, ...m.cc].map(a => a === state.profile.address ? 'me' : a).join(', ') || '—')}${mine && m.bcc.length ? ' · bcc ' + esc(m.bcc.join(', ')) : ''}</div>
+          <div class="snip-line">${esc(m.snippet)}</div></div>
+        <div class="tm">${fmtFull(m.t)}</div>
+        <button class="star ${m.starred ? 'on' : ''}" data-act="star" data-id="${esc(m.id)}" title="Star">${ic('star', 18)}</button></div>
+      <div class="msg-body">${sanitize(m.body)}</div>
+      ${atts ? `<div class="msg-atts">${atts}</div>` : ''}
+      ${i === ms.length - 1 ? `<div class="msg-act"><button class="btn" data-act="reply" data-id="${esc(m.id)}">${ic('reply', 16)}&nbsp;Reply</button>${(m.to.length + m.cc.length > 1) ? `<button class="btn" data-act="replyall" data-id="${esc(m.id)}">Reply all</button>` : ''}<button class="btn" data-act="forward" data-id="${esc(m.id)}">${ic('forward', 16)}&nbsp;Forward</button></div>` : ''}
+    </article>`;
+  }).join('');
+  return `<div class="toolbar">${tools}<span class="sp"></span><button class="star ${starred ? 'on' : ''}" data-act="tstar" data-id="${esc(state.openKey)}" title="Star">${ic('star', 18)}</button></div>
+  <div class="reader"><div class="r-subject"><span>${esc(last.subject || '(no subject)')}</span>${lbls}</div>${body}</div>`;
+}
+
+/* ------------------------------ mail actions ------------------------------ */
+const targetKeys = () => state.openKey ? new Set([state.openKey]) : new Set(state.selected);
+const mailsOfKeys = keys => state.mails.filter(m => keys.has(keyOf(m)) || (state.openKey && m.threadId === state.openKey));
+async function patchMails(items, dels = []) {
+  const uid = me(), all = [...items.map(i => ({ ...i, op: 'u' })), ...dels.map(id => ({ id, op: 'd' }))];
+  for (let i = 0; i < all.length; i += 400) {
+    const b = writeBatch(db);
+    all.slice(i, i + 400).forEach(it => { const r = doc(db, 'users', uid, 'mails', it.id); it.op === 'u' ? b.update(r, it.patch) : b.delete(r); });
+    await b.commit();
   }
-  if (!pg || !pg.textRuns || !pg.textRuns.length){
-    tab.innerHTML = `<p class="hint">No editable text found on this slide.</p>`;
-    return;
+}
+async function moveAction(kind) {
+  const keys = targetKeys(); if (!keys.size) return;
+  const uid = me(), list = mailsOfKeys(keys), items = [], dels = [], undo = [];
+  const rule = {
+    archive: m => m.folder === 'inbox' ? 'archive' : null,
+    trash: m => m.folder !== 'trash' ? 'trash' : null,
+    spam: m => m.folder !== 'spam' ? 'spam' : null,
+    restore: m => (m.folder === 'trash' || m.folder === 'spam') ? (m.from.uid === uid && m.folder === 'trash' ? 'sent' : 'inbox') : null
+  }[kind];
+  for (const m of list) {
+    if (kind === 'trash' && m.folder === 'drafts') { dels.push(m.id); continue; }
+    if (m.folder === 'drafts') continue;
+    const f = rule(m); if (f) { items.push({ id: m.id, patch: { folder: f } }); undo.push({ id: m.id, patch: { folder: m.folder } }); }
   }
-  tab.innerHTML = pg.textRuns.map((run,i)=>`
-    <div class="textrun-card">
-      <div class="tr-label">Run ${i+1}</div>
-      <textarea data-idx="${i}">${escapeHtml(run.text)}</textarea>
-    </div>`).join('');
-  tab.querySelectorAll('textarea').forEach(ta=>{
-    ta.addEventListener('input', ()=>{
-      pg.textRuns[+ta.dataset.idx].text = ta.value;
-      scheduleSave();
-    });
-  });
+  if (!items.length && !dels.length) return;
+  state.selected.clear(); state.openKey = null; renderAll();
+  try {
+    await patchMails(items, dels);
+    const msg = { archive: 'Conversation archived.', trash: 'Conversation moved to Trash.', spam: 'Reported as spam.', restore: 'Conversation restored.' }[kind];
+    toast(msg, undo.length ? { action: 'Undo', ms: 6000, onAction: () => patchMails(undo).catch(e => toast(e.message, { error: true })) } : {});
+  } catch (e) { toast('Action failed: ' + e.message, { error: true }); }
 }
-function escapeHtml(s){ return (s||'').replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+async function readAction(read) {
+  const keys = targetKeys(); const items = mailsOfKeys(keys).filter(m => m.read !== read && m.folder !== 'drafts').map(m => ({ id: m.id, patch: { read } }));
+  if (read === false && state.openKey) { state.openKey = null; state.selected.clear(); }
+  if (items.length) await patchMails(items).catch(e => toast(e.message, { error: true }));
+  if (read === false) renderAll();
+}
+async function deleteForever() {
+  const keys = targetKeys(); const list = mailsOfKeys(keys).filter(m => m.folder === 'trash' || m.folder === 'spam'); if (!list.length) return;
+  if (!await confirmBox('Delete forever?', `${list.length} message${list.length > 1 ? 's' : ''} will be permanently deleted. This cannot be undone.`, 'Delete forever')) return;
+  state.selected.clear(); state.openKey = null; renderAll();
+  await patchMails([], list.map(m => m.id)).catch(e => toast(e.message, { error: true }));
+}
+async function emptyFolder() {
+  const list = state.mails.filter(m => m.folder === state.view); if (!list.length) return;
+  if (!await confirmBox('Delete all messages?', `Permanently delete ${list.length} message${list.length > 1 ? 's' : ''} from ${viewTitle()}?`, 'Delete all')) return;
+  await patchMails([], list.map(m => m.id)).catch(e => toast(e.message, { error: true }));
+}
+async function toggleThreadStar(key) {
+  const ms = state.mails.filter(m => (state.view === 'drafts' && !state.query ? m.id : m.threadId) === key && m.folder !== 'drafts');
+  const any = ms.some(m => m.starred); if (!ms.length) return;
+  const items = any ? ms.filter(m => m.starred).map(m => ({ id: m.id, patch: { starred: false } })) : [{ id: ms[0].id, patch: { starred: true } }];
+  await patchMails(items).catch(e => toast(e.message, { error: true }));
+}
+function labelMenu(anchor) {
+  const keys = targetKeys(), list = mailsOfKeys(keys).filter(m => m.folder !== 'drafts'), labels = state.profile.labels || [];
+  if (!list.length) return;
+  if (!labels.length) { toast('Create a label first from the sidebar.'); return; }
+  popover(anchor, [{ head: 'Label as' }, ...labels.map(l => {
+    const all = list.every(m => m.labels.includes(l.id));
+    return { label: l.name, checked: all, fn: () => patchMails(list.map(m => ({ id: m.id, patch: { labels: all ? m.labels.filter(x => x !== l.id) : uniq([...m.labels, l.id]) } }))).catch(e => toast(e.message, { error: true })) };
+  })]);
+}
+async function openThread(key) {
+  if (state.view === 'drafts' && !state.query) { const d = state.mails.find(m => m.id === key); if (d) openDraft(d); return; }
+  state.openKey = key; state.cursor = -1;
+  const ms = threadMails(key); state.expanded = new Set(ms.filter(m => !m.read).map(m => m.id));
+  renderMain();
+  const unread = ms.filter(m => !m.read).map(m => ({ id: m.id, patch: { read: true } }));
+  if (unread.length) patchMails(unread).catch(() => { });
+}
+async function saveLabels(labels) { await updateDoc(doc(db, 'users', me()), { labels }); }
 
-/* Tab switching */
-document.querySelectorAll('.tab-btn').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-    btn.classList.add('active');
-    $('#tab-'+btn.dataset.tab).classList.add('active');
-  });
-});
-
-/* ============================================================
-   HISTORY (undo/redo) — snapshots whole document (pages meta + objects)
-   ============================================================ */
-function snapshotDoc(){
-  return state.pages.map(pg => ({
-    objects: JSON.parse(JSON.stringify(pg.objects.filter(o=>o.type!=='image'))), // image els aren't serializable; skipped from undo of geometry only for simplicity
-    dataUrl: pg.baseCanvas.toDataURL(),
-    width: pg.width, height: pg.height,
-    textRuns: pg.textRuns ? JSON.parse(JSON.stringify(pg.textRuns)) : undefined,
-  }));
-}
-function pushHistorySnapshotInit(){
-  state.history = [snapshotDoc()];
-  state.historyIndex = 0;
-  updateUndoRedoButtons();
-}
-function commitHistory(){
-  state.history = state.history.slice(0, state.historyIndex+1);
-  state.history.push(snapshotDoc());
-  if (state.history.length>40) state.history.shift();
-  state.historyIndex = state.history.length-1;
-  updateUndoRedoButtons();
-  buildPagesTab();
-  scheduleSave();
-}
-function restoreSnapshot(snap){
-  // rebuild canvases from dataURLs synchronously-ish
-  const promises = snap.map((s,i)=> new Promise(res=>{
-    const img = new Image();
-    img.onload = () => {
-      const c = document.createElement('canvas');
-      c.width = s.width; c.height = s.height;
-      c.getContext('2d').drawImage(img,0,0);
-      if (!state.pages[i]) state.pages[i] = {};
-      state.pages[i].baseCanvas = c;
-      state.pages[i].width = s.width; state.pages[i].height = s.height;
-      state.pages[i].objects = s.objects;
-      if (s.textRuns) state.pages[i].textRuns = s.textRuns;
-      res();
-    };
-    img.src = s.dataUrl;
-  }));
-  Promise.all(promises).then(()=>{
-    state.pages.length = snap.length;
-    if (state.currentPage>=state.pages.length) state.currentPage = state.pages.length-1;
-    renderCurrentPage(); buildPagesTab(); buildTextTab(); updateStatus();
-  });
-}
-function undo(){
-  if (state.historyIndex<=0) return;
-  state.historyIndex--;
-  restoreSnapshot(state.history[state.historyIndex]);
-  updateUndoRedoButtons();
-  scheduleSave();
-}
-function redo(){
-  if (state.historyIndex>=state.history.length-1) return;
-  state.historyIndex++;
-  restoreSnapshot(state.history[state.historyIndex]);
-  updateUndoRedoButtons();
-  scheduleSave();
-}
-function updateUndoRedoButtons(){
-  $('#btn-undo').disabled = state.historyIndex<=0;
-  $('#btn-redo').disabled = state.historyIndex>=state.history.length-1;
-}
-$('#btn-undo').onclick = undo;
-$('#btn-redo').onclick = redo;
-
-/* ============================================================
-   ZOOM / STATUS
-   ============================================================ */
-$('#zoom-in').onclick = ()=>{ state.zoom = Math.min(3, state.zoom+0.1); applyZoomStyle(); updateStatus(); };
-$('#zoom-out').onclick = ()=>{ state.zoom = Math.max(0.2, state.zoom-0.1); applyZoomStyle(); updateStatus(); };
-function updateStatus(){
-  $('#zoom-level').textContent = Math.round(state.zoom*100)+'%';
-  const pg = state.pages[state.currentPage];
-  if (!pg){ $('#status-info').textContent = 'No document loaded'; syncMenuState(); return; }
-  const label = state.fileType==='pptx' ? 'Slide' : 'Page';
-  $('#status-info').textContent = `${label} ${state.currentPage+1} of ${state.pages.length} · ${pg.width}×${pg.height}px`;
-  syncMenuState();
+/* ------------------------------ settings ------------------------------ */
+function openSettings() {
+  const p = state.profile;
+  const m = modal(`<h2>Settings</h2><form>
+    <label class="fld"><span>Display name</span><input id="sName" maxlength="60" value="${esc(p.displayName)}"></label>
+    <label class="fld"><span>Your address</span><input value="${esc(p.address)}" disabled></label>
+    <label class="fld"><span>Signature</span><textarea id="sSig" maxlength="1000">${esc(p.signature || '')}</textarea></label>
+    <label class="fld"><span>Theme</span><select id="sTheme"><option value="light">Light</option><option value="dark">Dark</option></select></label>
+    <label class="fld"><span>Density</span><select id="sDen"><option value="comfortable">Comfortable</option><option value="compact">Compact</option></select></label>
+    <label class="fld"><span>Desktop notifications</span><button type="button" class="btn" id="sNotif">${'Notification' in window ? (Notification.permission === 'granted' ? 'Enabled' : 'Enable notifications') : 'Not supported'}</button></label>
+    <div class="acts"><button type="button" class="btn" data-x>Cancel</button><button class="btn primary">Save</button></div></form>
+    <p style="margin-top:14px;font-size:12px">Shortcuts: c compose · / search · j/k move · Enter open · u back · e archive · # delete · ! spam · s star · r reply · a reply all · f forward</p>`);
+  $('#sTheme', m.el).value = p.theme === 'dark' ? 'dark' : 'light'; $('#sDen', m.el).value = p.density === 'compact' ? 'compact' : 'comfortable';
+  $('[data-x]', m.el).onclick = m.close;
+  $('#sNotif', m.el).onclick = async e => { if ('Notification' in window) { const r = await Notification.requestPermission(); e.target.textContent = r === 'granted' ? 'Enabled' : 'Blocked in browser'; } };
+  $('form', m.el).onsubmit = async e => {
+    e.preventDefault();
+    const name = $('#sName', m.el).value.trim(); if (!name) return;
+    try { await updateDoc(doc(db, 'users', me()), { displayName: name, signature: $('#sSig', m.el).value.slice(0, 1000), theme: $('#sTheme', m.el).value, density: $('#sDen', m.el).value }); m.close(); toast('Settings saved.'); }
+    catch (x) { toast('Could not save: ' + x.message, { error: true }); }
+  };
 }
 
-/* ============================================================
-   FLATTEN (bake objects onto a copy of base canvas)
-   ============================================================ */
-function flattenPage(pg){
-  const c = document.createElement('canvas');
-  c.width = pg.width; c.height = pg.height;
-  const ctx = c.getContext('2d');
-  ctx.drawImage(pg.baseCanvas,0,0);
-  pg.objects.forEach(obj => drawObject(ctx, obj, false));
+/* ------------------------------ compose ------------------------------ */
+let cseq = 0;
+const sigHtml = () => { const s = (state.profile.signature || '').trim(); return s ? `<div><br></div><div>-- <br>${esc(s).replace(/\n/g, '<br>')}</div>` : ''; };
+function openCompose(init = {}) {
+  if (state.composes.size >= 3) { toast('Close a draft window first.'); return null; }
+  const c = {
+    cid: 'c' + (++cseq), to: [...(init.to || [])], cc: [...(init.cc || [])], bcc: [...(init.bcc || [])], subject: init.subject || '',
+    attachments: [...(init.attachments || [])], threadId: init.threadId || null, draftId: init.draftId || doc(collection(db, 'users', me(), 'mails')).id,
+    saved: init.saved ?? !!init.draftId, uploading: 0, timer: null
+  };
+  const el = document.createElement('section'); el.className = 'compose'; el.id = c.cid; c.el = el;
+  const cm = contacts();
+  el.innerHTML = `<header class="c-head"><span class="c-title">${esc(init.title || 'New message')}</span>
+    <button class="icon-btn sm" data-c="min" title="Minimize">${ic('minus', 16)}</button><button class="icon-btn sm" data-c="max" title="Full screen">${ic('max', 16)}</button><button class="icon-btn sm" data-c="close" title="Save &amp; close">${ic('x', 16)}</button></header>
+    <div class="c-main">
+      <div class="c-row"><label>To</label><div class="field" data-f="to"><input list="dl-${c.cid}" autocomplete="off" aria-label="To" spellcheck="false"></div><button type="button" class="linkbtn" data-c="ccbcc" ${c.cc.length || c.bcc.length ? 'hidden' : ''}>Cc Bcc</button></div>
+      <div class="c-row" data-r="cc" ${c.cc.length ? '' : 'hidden'}><label>Cc</label><div class="field" data-f="cc"><input list="dl-${c.cid}" autocomplete="off" aria-label="Cc" spellcheck="false"></div></div>
+      <div class="c-row" data-r="bcc" ${c.bcc.length ? '' : 'hidden'}><label>Bcc</label><div class="field" data-f="bcc"><input list="dl-${c.cid}" autocomplete="off" aria-label="Bcc" spellcheck="false"></div></div>
+      <datalist id="dl-${c.cid}">${[...cm].slice(0, 200).map(([a, n]) => `<option value="${esc(a)}">${esc(n)}</option>`).join('')}</datalist>
+      <input class="c-subject" placeholder="Subject" maxlength="300" value="${esc(c.subject)}">
+      <div class="fmt"><button type="button" data-fmt="bold" title="Bold">B</button><button type="button" data-fmt="italic" title="Italic" style="font-style:italic">I</button><button type="button" data-fmt="underline" title="Underline" style="text-decoration:underline">U</button><button type="button" data-fmt="insertUnorderedList" title="Bullets">${ic('list', 16)}</button><button type="button" data-fmt="insertOrderedList" title="Numbered list">1.</button><button type="button" data-fmt="quote" title="Quote">&ldquo;</button><button type="button" data-fmt="link" title="Insert link">${ic('link', 16)}</button><button type="button" data-fmt="removeFormat" title="Clear formatting">${ic('erase', 16)}</button></div>
+      <div class="editor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Message body"></div>
+      <div class="c-atts"></div>
+      <div class="c-foot"><button class="btn primary" data-c="send">Send</button><button class="icon-btn sm" data-c="attach" title="Attach files">${ic('clip', 18)}</button><span class="grow" data-s></span><button class="icon-btn sm" data-c="discard" title="Discard draft">${ic('trash', 18)}</button><input type="file" multiple hidden></div>
+    </div>`;
+  const ed = $('.editor', el); ed.innerHTML = sanitize(init.html || '') || sigHtml();
+  state.composes.set(c.cid, c); $('#composeDock').appendChild(el);
+  ['to', 'cc', 'bcc'].forEach(f => renderChips(c, f)); renderAtts(c);
+  bindCompose(c);
+  (c.to.length ? ed : $('[data-f=to] input', el)).focus();
+  if (c.to.length) { const r = document.createRange(); r.setStart(ed, 0); r.collapse(true); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
   return c;
 }
-
-/* ============================================================
-   EXPORT
-   ============================================================ */
-$('#btn-export').onclick = () => exportFile();
-async function exportFile(){
-  if (!state.pages.length) return;
+function renderChips(c, f) {
+  const field = $(`[data-f=${f}]`, c.el), inp = $('input', field);
+  field.querySelectorAll('.chip').forEach(x => x.remove());
+  c[f].forEach((a, i) => { const s = document.createElement('span'); s.className = 'chip'; s.innerHTML = `${esc(a)}<button type="button" data-rm="${i}" aria-label="Remove">${ic('x', 12)}</button>`; field.insertBefore(s, inp); });
+}
+function renderAtts(c) {
+  $('.c-atts', c.el).innerHTML = c.attachments.map((a, i) => `<span class="att">${ic('clip', 16)}<span>${esc(a.name)}</span><small>${fmtSize(a.size || 0)}</small><button type="button" data-rmatt="${i}" aria-label="Remove">${ic('x', 14)}</button></span>`).join('') + (c.uploading ? `<span class="att"><span class="spin"></span><span>Uploading…</span></span>` : '');
+}
+function commitChip(c, f) {
+  const inp = $(`[data-f=${f}] input`, c.el), bad = [];
+  inp.value.split(/[,;\s]+/).map(s => s.trim().toLowerCase()).filter(Boolean).forEach(p => {
+    const mm = p.match(/<([^>]+)>/), a = mm ? mm[1] : p;
+    if (EMAIL_RE.test(a)) { if (!c[f].includes(a)) c[f].push(a); } else bad.push(p);
+  });
+  inp.value = bad.join(' '); inp.classList.toggle('bad', bad.length > 0);
+  renderChips(c, f); scheduleSave(c);
+}
+function bindCompose(c) {
+  const el = c.el, ed = $('.editor', el), subj = $('.c-subject', el), file = $('input[type=file]', el);
+  $('.c-head', el).addEventListener('click', e => { if (!e.target.closest('button')) el.classList.toggle('min'); });
+  ['to', 'cc', 'bcc'].forEach(f => {
+    const field = $(`[data-f=${f}]`, el), inp = $('input', field);
+    field.addEventListener('click', e => {
+      const rm = e.target.closest('[data-rm]'); if (rm) { c[f].splice(+rm.dataset.rm, 1); renderChips(c, f); scheduleSave(c); } else if (e.target === field) inp.focus();
+    });
+    inp.addEventListener('keydown', e => {
+      if (['Enter', ',', ';', ' ', 'Tab'].includes(e.key) && inp.value.trim()) { if (e.key !== 'Tab') e.preventDefault(); commitChip(c, f); }
+      else if (e.key === 'Backspace' && !inp.value && c[f].length) { c[f].pop(); renderChips(c, f); }
+    });
+    inp.addEventListener('change', () => commitChip(c, f));
+    inp.addEventListener('blur', () => commitChip(c, f));
+  });
+  ed.addEventListener('input', () => scheduleSave(c)); subj.addEventListener('input', () => scheduleSave(c));
+  el.addEventListener('mousedown', e => { if (e.target.closest('[data-fmt]')) e.preventDefault(); });
+  el.addEventListener('click', async e => {
+    const fm = e.target.closest('[data-fmt]');
+    if (fm) {
+      const k = fm.dataset.fmt; ed.focus();
+      if (k === 'quote') document.execCommand('formatBlock', false, 'blockquote');
+      else if (k === 'link') {
+        const sel = getSelection(), range = sel.rangeCount ? sel.getRangeAt(0).cloneRange() : null;
+        const url = await askText('Insert link', { placeholder: 'https://example.com', ok: 'Add' });
+        if (url && /^(https?:\/\/|mailto:)/i.test(url)) { ed.focus(); if (range) { sel.removeAllRanges(); sel.addRange(range); } document.execCommand('createLink', false, url); }
+        else if (url) toast('Links must start with http://, https:// or mailto:', { error: true });
+      } else document.execCommand(k, false, null);
+      scheduleSave(c); return;
+    }
+    const b = e.target.closest('[data-c]'); if (b) {
+      const a = b.dataset.c;
+      if (a === 'min') el.classList.toggle('min');
+      else if (a === 'max') { el.classList.remove('min'); el.classList.toggle('max'); }
+      else if (a === 'close') closeCompose(c, { save: true });
+      else if (a === 'discard') discardCompose(c);
+      else if (a === 'ccbcc') { $('[data-r=cc]', el).hidden = false; $('[data-r=bcc]', el).hidden = false; b.hidden = true; $('[data-f=cc] input', el).focus(); }
+      else if (a === 'attach') file.click();
+      else if (a === 'send') sendCompose(c);
+      return;
+    }
+    const ra = e.target.closest('[data-rmatt]'); if (ra) { c.attachments.splice(+ra.dataset.rmatt, 1); renderAtts(c); scheduleSave(c); }
+  });
+  file.addEventListener('change', async () => {
+    const files = [...file.files]; file.value = '';
+    if (!GAS_ON) { toast('Attachments need the Apps Script backend. Set GAS_URL first.', { error: true }); return; }
+    for (const f of files) {
+      if (f.size > MAX_ATTACH) { toast(`${f.name} is larger than ${fmtSize(MAX_ATTACH)}.`, { error: true }); continue; }
+      if (c.attachments.length + c.uploading >= 10) { toast('Maximum 10 attachments.', { error: true }); break; }
+      c.uploading++; renderAtts(c);
+      try {
+        const data = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1]); r.onerror = rej; r.readAsDataURL(f); });
+        const r = await gas({ action: 'upload', name: f.name, mimeType: f.type || 'application/octet-stream', data });
+        c.attachments.push(r.file);
+      } catch (x) { toast(`Upload failed: ${x.message}`, { error: true }); }
+      c.uploading--; renderAtts(c); scheduleSave(c);
+    }
+  });
+}
+function composeData(c) {
+  ['to', 'cc', 'bcc'].forEach(f => { if ($(`[data-f=${f}] input`, c.el).value.trim()) commitChip(c, f); });
+  const html = sanitize($('.editor', c.el).innerHTML);
+  return { draftId: c.draftId, saved: c.saved, to: [...c.to], cc: [...c.cc], bcc: [...c.bcc], subject: $('.c-subject', c.el).value.trim(), html, attachments: [...c.attachments], threadId: c.threadId };
+}
+const isBlank = d => !d.to.length && !d.cc.length && !d.bcc.length && !d.subject && !d.attachments.length && !textOf(d.html).replace(/^--/, '').trim();
+function scheduleSave(c) { clearTimeout(c.timer); c.timer = setTimeout(() => saveDraft(c), 1500); }
+async function saveDraft(c) {
+  if (!state.composes.has(c.cid)) return;
+  const d = composeData(c); if (isBlank(d)) return;
+  await writeDraft(d); c.saved = true;
+  const s = $('[data-s]', c.el); if (s) { s.textContent = 'Draft saved'; setTimeout(() => { if (s) s.textContent = ''; }, 2000); }
+}
+async function writeDraft(d) {
+  const ref = doc(db, 'users', me(), 'mails', d.draftId), snippet = textOf(d.html).slice(0, 140);
+  const content = { to: d.to, cc: d.cc, bcc: d.bcc, subject: d.subject, body: d.html, snippet, threadId: d.threadId || d.draftId, attachments: d.attachments, ts: serverTimestamp() };
   try {
-    if (state.fileType === 'png') await exportPNG();
-    else if (state.fileType === 'pdf') await exportPDF();
-    else if (state.fileType === 'pptx') await exportPPTX();
-  } catch(err){
-    console.error(err);
-    toast('Export failed: ' + err.message);
-  }
+    if (d.saved) await updateDoc(ref, content);
+    else await setDoc(ref, { ...content, from: { uid: me(), name: state.profile.displayName, address: state.profile.address }, folder: 'drafts', read: true, starred: false, labels: [] });
+  } catch (e) { console.error(e); toast('Could not save draft: ' + e.message, { error: true }); }
 }
-function downloadBlob(blob, filename){
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = filename;
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+async function closeCompose(c, { save = false } = {}) {
+  clearTimeout(c.timer);
+  if (save) { const d = composeData(c); if (!isBlank(d)) { await writeDraft(d); toast('Draft saved.'); } }
+  c.el.remove(); state.composes.delete(c.cid);
 }
-async function exportPNG(){
-  if (state.pages.length === 1){
-    const c = flattenPage(state.pages[0]);
-    c.toBlob(blob => downloadBlob(blob, baseName()+'.png'), 'image/png');
-  } else {
-    const zip = new JSZip();
-    state.pages.forEach((pg,i)=>{
-      const c = flattenPage(pg);
-      const dataUrl = c.toDataURL('image/png').split(',')[1];
-      zip.file(`page-${i+1}.png`, dataUrl, {base64:true});
-    });
-    const blob = await zip.generateAsync({type:'blob'});
-    downloadBlob(blob, baseName()+'-pages.zip');
-  }
-  toast('Exported PNG');
+async function discardCompose(c) {
+  clearTimeout(c.timer);
+  const d = composeData(c);
+  if (!isBlank(d) && !await confirmBox('Discard draft?', 'This message will be deleted.', 'Discard')) return;
+  c.el.remove(); state.composes.delete(c.cid);
+  if (c.saved) deleteDoc(doc(db, 'users', me(), 'mails', c.draftId)).catch(() => { });
 }
-async function exportPDF(){
-  const { PDFDocument } = PDFLib;
-  const pdfDoc = await PDFDocument.create();
-  for (const pg of state.pages){
-    const c = flattenPage(pg);
-    const pngBytes = await (await fetch(c.toDataURL('image/png'))).arrayBuffer();
-    const img = await pdfDoc.embedPng(pngBytes);
-    const page = pdfDoc.addPage([c.width, c.height]);
-    page.drawImage(img, {x:0, y:0, width:c.width, height:c.height});
-  }
-  const bytes = await pdfDoc.save();
-  downloadBlob(new Blob([bytes], {type:'application/pdf'}), baseName()+'.pdf');
-  toast('Exported PDF');
-}
-async function exportPPTX(){
-  const zip = state.pptxZip;
-  if (!zip){ toast('Original PPTX data unavailable'); return; }
-
-  // 1. Write back edited text runs + annotation overlay image per existing slide.
-  for (const pg of state.pages){
-    if (!pg.slideRelPath) continue; // new duplicated slide handled separately below
-    let xmlStr = pg.slideXml;
-    if (pg.textRuns && pg.textRuns.length){
-      const dom = new DOMParser().parseFromString(xmlStr, 'application/xml');
-      const nodes = [...dom.getElementsByTagName('a:t')];
-      pg.textRuns.forEach((run,i)=>{ if (nodes[i]) nodes[i].textContent = run.text; });
-      xmlStr = new XMLSerializer().serializeToString(dom);
-    }
-    if (pg.objects.length){
-      // bake annotations as a transparent PNG overlay and embed as a picture covering the slide
-      const overlayC = document.createElement('canvas');
-      overlayC.width = pg.width; overlayC.height = pg.height;
-      const octx2 = overlayC.getContext('2d');
-      pg.objects.forEach(obj => drawObject(octx2, obj, false));
-      const pngB64 = overlayC.toDataURL('image/png').split(',')[1];
-      const mediaName = `pro-editor-overlay-${pg.slideRelPath.replace(/[^a-z0-9]/gi,'')}.png`;
-      zip.file(`ppt/media/${mediaName}`, pngB64, {base64:true});
-
-      const relsPath = pg.slideRelPath.replace('slides/', 'slides/_rels/') + '.rels';
-      let relsXml = zip.file(relsPath) ? await zip.file(relsPath).async('string') :
-        `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`;
-      const relDom = new DOMParser().parseFromString(relsXml, 'application/xml');
-      const existingIds = [...relDom.getElementsByTagName('Relationship')].map(r=>r.getAttribute('Id'));
-      let n=1; while (existingIds.includes('rIdOverlay'+n)) n++;
-      const newRid = 'rIdOverlay'+n;
-      const rel = relDom.createElement('Relationship');
-      rel.setAttribute('Id', newRid);
-      rel.setAttribute('Type','http://schemas.openxmlformats.org/officeDocument/2006/relationships/image');
-      rel.setAttribute('Target', `../media/${mediaName}`);
-      relDom.documentElement.appendChild(rel);
-      relsXml = new XMLSerializer().serializeToString(relDom);
-      zip.file(relsPath, relsXml);
-
-      const picXml = `<p:pic xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-        <p:nvPicPr><p:cNvPr id="9001" name="ProEditorOverlay"/><p:cNvPicPr/><p:nvPr/></p:nvPicPr>
-        <p:blipFill><a:blip r:embed="${newRid}"/><a:stretch><a:fillRect/></a:stretch></p:blipFill>
-        <p:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${state.pptxSlideSize.cx}" cy="${state.pptxSlideSize.cy}"/></a:xfrm>
-        <a:prstGeom prst="rect"><a:avLst/></a:prstGeom></p:spPr></p:pic>`;
-      xmlStr = xmlStr.replace('</p:spTree>', picXml + '</p:spTree>');
-    }
-    zip.file(pg.slideRelPath, xmlStr);
-  }
-
-  // 2. Handle brand-new (duplicated) slides not present in original zip.
-  let dupCounter = 1;
-  const newSlideEntries = [];
-  for (const pg of state.pages){
-    if (pg.slideRelPath) continue;
-    const srcPath = pg.duplicateOf;
-    const srcXml = await zip.file(srcPath).async('string');
-    let newName;
-    do { newName = `ppt/slides/slideProEditorDup${dupCounter++}.xml`; } while (zip.file(newName));
-    zip.file(newName, srcXml);
-    // copy rels if present
-    const srcRels = srcPath.replace('slides/', 'slides/_rels/') + '.rels';
-    if (zip.file(srcRels)){
-      zip.file(newName.replace('slides/', 'slides/_rels/') + '.rels', await zip.file(srcRels).async('string'));
-    }
-    pg.slideRelPath = newName;
-    newSlideEntries.push(pg);
-  }
-  if (newSlideEntries.length){
-    // register in [Content_Types].xml
-    const ctPath = '[Content_Types].xml';
-    let ctXml = await zip.file(ctPath).async('string');
-    const ctDom = new DOMParser().parseFromString(ctXml, 'application/xml');
-    newSlideEntries.forEach(pg=>{
-      const override = ctDom.createElement('Override');
-      override.setAttribute('PartName', '/' + pg.slideRelPath);
-      override.setAttribute('ContentType','application/vnd.openxmlformats-officedocument.presentationml.slide+xml');
-      ctDom.documentElement.appendChild(override);
-    });
-    zip.file(ctPath, new XMLSerializer().serializeToString(ctDom));
-
-    // register relationships in presentation.xml.rels + presentation.xml sldIdLst
-    const relsPath = 'ppt/_rels/presentation.xml.rels';
-    let relsXml = await zip.file(relsPath).async('string');
-    const relDom = new DOMParser().parseFromString(relsXml, 'application/xml');
-    const existingIds = [...relDom.getElementsByTagName('Relationship')].map(r=>r.getAttribute('Id'));
-    let maxNum = Math.max(0, ...existingIds.map(id=>parseInt((id.match(/\d+/)||['0'])[0])||0));
-    newSlideEntries.forEach(pg=>{
-      maxNum++;
-      const rid = 'rId'+maxNum;
-      const rel = relDom.createElement('Relationship');
-      rel.setAttribute('Id', rid);
-      rel.setAttribute('Type','http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide');
-      rel.setAttribute('Target', pg.slideRelPath.replace('ppt/',''));
-      relDom.documentElement.appendChild(rel);
-      pg._newRid = rid;
-    });
-    zip.file(relsPath, new XMLSerializer().serializeToString(relDom));
-  }
-
-  // 3. Rebuild sldIdLst to match current state.pages order (also drops deleted slides).
-  const presDom = new DOMParser().parseFromString(state.pptxPresentationXml, 'application/xml');
-  const sldIdLst = presDom.getElementsByTagName('p:sldIdLst')[0];
-  const relsPathP = 'ppt/_rels/presentation.xml.rels';
-  const relsXmlP = await zip.file(relsPathP).async('string');
-  const relDomP = new DOMParser().parseFromString(relsXmlP, 'application/xml');
-  const targetToRid = {};
-  [...relDomP.getElementsByTagName('Relationship')].forEach(r=>{
-    targetToRid[r.getAttribute('Target').replace(/^\.?\/?/,'')] = r.getAttribute('Id');
-  });
-  while (sldIdLst.firstChild) sldIdLst.removeChild(sldIdLst.firstChild);
-  let sldIdCounter = 256;
-  state.pages.forEach(pg=>{
-    const target = pg.slideRelPath.replace('ppt/','');
-    const rid = pg._newRid || targetToRid[target];
-    if (!rid) return;
-    const node = presDom.createElement('p:sldId');
-    node.setAttribute('id', String(sldIdCounter++));
-    node.setAttribute('r:id', rid);
-    sldIdLst.appendChild(node);
-  });
-  zip.file('ppt/presentation.xml', new XMLSerializer().serializeToString(presDom));
-
-  const blob = await zip.generateAsync({type:'blob', mimeType:'application/vnd.openxmlformats-officedocument.presentationml.presentation'});
-  downloadBlob(blob, baseName()+'.pptx');
-  toast('Exported PPTX');
-}
-function baseName(){
-  return (state.fileName || 'document').replace(/\.[^.]+$/, '');
+function openDraft(m) {
+  const existing = [...state.composes.values()].find(c => c.draftId === m.id); if (existing) { existing.el.classList.remove('min'); return; }
+  openCompose({ draftId: m.id, saved: true, to: m.to, cc: m.cc, bcc: m.bcc, subject: m.subject === '(no subject)' ? '' : m.subject, html: m.body, attachments: m.attachments, threadId: m.threadId === m.id ? null : m.threadId, title: 'Draft' });
 }
 
-/* ============================================================
-   LOCAL PROJECT STORAGE (IndexedDB) — the "dashboard" layer
-   Everything below persists documents to this browser only.
-   Nothing is uploaded anywhere.
-   ============================================================ */
-const IDB_NAME = 'proEditorLibrary';
-const IDB_VERSION = 1;
-const IDB_STORE = 'projects';
-
-function idbOpen(){
-  return new Promise((resolve, reject)=>{
-    const req = indexedDB.open(IDB_NAME, IDB_VERSION);
-    req.onupgradeneeded = () => {
-      const db = req.result;
-      if (!db.objectStoreNames.contains(IDB_STORE)){
-        const store = db.createObjectStore(IDB_STORE, {keyPath:'id'});
-        store.createIndex('updatedAt','updatedAt');
-      }
-    };
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
+function sendCompose(c) {
+  const d = composeData(c);
+  if (c.uploading) { toast('Wait for attachments to finish uploading.'); return; }
+  const all = uniq([...d.to, ...d.cc, ...d.bcc]);
+  if (!all.length) { toast('Add at least one recipient.', { error: true }); return; }
+  if (all.length > MAX_RECIPIENTS) { toast(`Maximum ${MAX_RECIPIENTS} recipients per message.`, { error: true }); return; }
+  if (all.some(a => !isInternal(a)) && !GAS_ON) { toast('Sending to external addresses needs the Apps Script backend.', { error: true }); return; }
+  const go = () => { closeCompose(c); queueSend(d); };
+  if (!d.subject) confirmBox('Send without subject?', 'This message has no subject line.', 'Send anyway').then(ok => ok && go()); else go();
 }
-async function idbPut(record){
-  const db = await idbOpen();
-  return new Promise((resolve, reject)=>{
-    const tx = db.transaction(IDB_STORE, 'readwrite');
-    tx.objectStore(IDB_STORE).put(record);
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
+function queueSend(d) {
+  let cancelled = false;
+  const t = setTimeout(async () => {
+    if (cancelled) return;
+    try { await deliver(d); toast('Message sent.'); }
+    catch (err) { console.error(err); toast(err.message || 'Message could not be sent.', { error: true, ms: 8000 }); openCompose({ ...d, title: 'Not sent' }); }
+  }, 5000);
+  toast('Sending…', { ms: 5000, action: 'Undo', onAction: () => { cancelled = true; clearTimeout(t); openCompose(d); } });
 }
-async function idbGet(id){
-  const db = await idbOpen();
-  return new Promise((resolve, reject)=>{
-    const tx = db.transaction(IDB_STORE, 'readonly');
-    const req = tx.objectStore(IDB_STORE).get(id);
-    req.onsuccess = () => resolve(req.result || null);
-    req.onerror = () => reject(req.error);
-  });
-}
-async function idbGetAll(){
-  const db = await idbOpen();
-  return new Promise((resolve, reject)=>{
-    const tx = db.transaction(IDB_STORE, 'readonly');
-    const req = tx.objectStore(IDB_STORE).getAll();
-    req.onsuccess = () => resolve(req.result || []);
-    req.onerror = () => reject(req.error);
-  });
-}
-async function idbDelete(id){
-  const db = await idbOpen();
-  return new Promise((resolve, reject)=>{
-    const tx = db.transaction(IDB_STORE, 'readwrite');
-    tx.objectStore(IDB_STORE).delete(id);
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
-}
-function newProjectId(){
-  return 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
-}
-
-/* ---- serialize current in-memory document into a storable record ---- */
-function loadImgFromDataUrl(url){
-  return new Promise((resolve, reject)=>{
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-    img.src = url;
-  });
-}
-function imageObjDataUrl(obj){
-  if (obj._dataUrl) return obj._dataUrl;
-  const c = document.createElement('canvas');
-  c.width = obj.img.naturalWidth || Math.round(obj.w) || 1;
-  c.height = obj.img.naturalHeight || Math.round(obj.h) || 1;
-  c.getContext('2d').drawImage(obj.img, 0, 0, c.width, c.height);
-  obj._dataUrl = c.toDataURL('image/png');
-  return obj._dataUrl;
-}
-function serializeObjects(objects){
-  return objects.map(o=>{
-    if (o.type === 'image'){
-      const {img, ...rest} = o;
-      return {...rest, dataUrl: imageObjDataUrl(o)};
-    }
-    return {...o};
-  });
-}
-function serializePages(){
-  return state.pages.map(pg => ({
-    width: pg.width, height: pg.height,
-    dataUrl: pg.baseCanvas.toDataURL('image/png'),
-    objects: serializeObjects(pg.objects),
-    textRuns: pg.textRuns ? pg.textRuns.map(t=>({...t})) : undefined,
-    slideRelPath: pg.slideRelPath, duplicateOf: pg.duplicateOf,
+async function deliver(d) {
+  const uid = me(), p = state.profile;
+  const all = uniq([...d.to, ...d.cc, ...d.bcc]), internal = all.filter(isInternal), external = all.filter(a => !isInternal(a));
+  const targets = new Map(), missing = [];
+  await Promise.all(internal.map(async a => {
+    const s = await getDoc(doc(db, 'usernames', a.split('@')[0]));
+    if (s.exists()) targets.set(a, s.data().uid); else missing.push(a);
   }));
-}
-async function deserializeObjects(objs){
-  const out = [];
-  for (const o of (objs||[])){
-    if (o.type === 'image'){
-      const img = await loadImgFromDataUrl(o.dataUrl);
-      const {dataUrl, ...rest} = o;
-      out.push({...rest, img, _dataUrl: dataUrl});
-    } else {
-      out.push({...o});
+  if (missing.length) throw new Error('Address not found: ' + missing.join(', '));
+  const msgId = doc(collection(db, 'users', uid, 'mails')).id;
+  const threadId = d.threadId || msgId;
+  const base = {
+    from: { uid, name: p.displayName, address: p.address }, to: d.to, cc: d.cc, subject: d.subject || '(no subject)', body: d.html,
+    snippet: textOf(d.html).slice(0, 140), threadId, labels: [], attachments: d.attachments, starred: false, ts: serverTimestamp()
+  };
+  const batch = writeBatch(db), sentRef = doc(db, 'users', uid, 'mails', msgId);
+  batch.set(sentRef, { ...base, bcc: d.bcc, folder: 'sent', read: true, ...(external.length ? { external, extStatus: 'pending' } : {}) });
+  const done = new Set();
+  for (const [, tuid] of targets) {
+    if (done.has(tuid)) continue; done.add(tuid);
+    batch.set(doc(db, 'users', tuid, 'mails', tuid === uid ? msgId + '_in' : msgId), { ...base, folder: 'inbox', read: false });
+  }
+  batch.delete(doc(db, 'users', uid, 'mails', d.draftId));
+  await batch.commit();
+  if (external.length) {
+    try {
+      await gas({ action: 'send', to: d.to.filter(a => !isInternal(a)), cc: d.cc.filter(a => !isInternal(a)), bcc: d.bcc.filter(a => !isInternal(a)), subject: d.subject || '(no subject)', html: d.html, attachments: d.attachments.map(a => a.id).filter(Boolean), fromName: p.displayName, fromAddress: p.address });
+      await updateDoc(sentRef, { extStatus: 'sent' });
+    } catch (x) {
+      await updateDoc(sentRef, { extStatus: 'failed' }).catch(() => { });
+      toast('Delivered inside Pro Mail, but external delivery failed: ' + x.message, { error: true, ms: 9000 });
     }
   }
-  return out;
 }
-async function deserializePages(pagesData){
-  const pages = [];
-  for (const pd of pagesData){
-    const img = await loadImgFromDataUrl(pd.dataUrl);
-    const c = document.createElement('canvas');
-    c.width = pd.width; c.height = pd.height;
-    c.getContext('2d').drawImage(img,0,0);
-    const objects = await deserializeObjects(pd.objects);
-    pages.push({
-      baseCanvas: c, width: pd.width, height: pd.height, objects,
-      textRuns: pd.textRuns, slideRelPath: pd.slideRelPath, duplicateOf: pd.duplicateOf,
-    });
+
+/* reply / forward */
+function quoteBlock(m) {
+  return `<div><br></div>${sigHtml()}<div><br></div><div>On ${esc(fmtFull(m.t))}, ${esc(m.from.name || m.from.address)} &lt;${esc(m.from.address)}&gt; wrote:</div><blockquote>${sanitize(m.body)}</blockquote>`;
+}
+const reSubj = (s, p) => new RegExp('^' + p + ':', 'i').test(s || '') ? s : `${p}: ${s || ''}`;
+function replyTo(m, all) {
+  const self = state.profile.address;
+  const to = m.from.uid === me() ? [...m.to] : [m.from.address];
+  const cc = all ? uniq([...m.to, ...m.cc]).filter(a => a !== self && !to.includes(a)) : [];
+  openCompose({ to: uniq(to), cc, subject: reSubj(m.subject, 'Re'), html: quoteBlock(m), threadId: m.threadId, title: 'Reply' });
+}
+function forwardMail(m) {
+  const head = `<div><br></div>${sigHtml()}<div><br></div><div>---------- Forwarded message ----------<br>From: ${esc(m.from.name)} &lt;${esc(m.from.address)}&gt;<br>Date: ${esc(fmtFull(m.t))}<br>Subject: ${esc(m.subject)}<br>To: ${esc(m.to.join(', '))}</div><br>${sanitize(m.body)}`;
+  openCompose({ subject: reSubj(m.subject, 'Fwd'), html: head, attachments: m.attachments, title: 'Forward' });
+}
+
+/* ------------------------------ events ------------------------------ */
+const ACT = {
+  menu() { if (innerWidth <= 860) document.body.classList.toggle('sb-open'); else document.body.classList.toggle('sb-collapsed'); },
+  compose() { openCompose(); },
+  nav(el) { state.view = el.dataset.view; state.query = ''; $('#search').value = ''; $('#clearSearch').hidden = true; state.openKey = null; state.selected.clear(); state.cursor = -1; document.body.classList.remove('sb-open'); renderAll(); },
+  open(el) { openThread(el.dataset.id); },
+  back() { state.openKey = null; renderMain(); },
+  sel(el) { const k = el.dataset.id; state.selected.has(k) ? state.selected.delete(k) : state.selected.add(k); renderMain(); },
+  selall() { const th = state.threads; if (th.length && th.every(t => state.selected.has(t.key))) state.selected.clear(); else th.forEach(t => state.selected.add(t.key)); renderMain(); },
+  star(el) { const m = state.mails.find(x => x.id === el.dataset.id); if (m) patchMails([{ id: m.id, patch: { starred: !m.starred } }]).catch(e => toast(e.message, { error: true })); },
+  tstar(el) { toggleThreadStar(el.dataset.id); },
+  archive() { moveAction('archive'); }, trash() { moveAction('trash'); }, spam() { moveAction('spam'); }, restore() { moveAction('restore'); },
+  markread() { readAction(true); }, markunread() { readAction(false); },
+  deleteforever() { deleteForever(); }, emptyfolder() { emptyFolder(); },
+  labelmenu(el) { labelMenu(el); },
+  refresh() { startMails(); toast('Refreshed.', { ms: 1500 }); },
+  more() { state.limit += PAGE; startMails(); },
+  togglemsg(el) { const id = el.dataset.id; state.expanded.has(id) ? state.expanded.delete(id) : state.expanded.add(id); const ms = threadMails(state.openKey); if (id === ms[ms.length - 1].id) return; renderMain(); },
+  reply(el) { const m = state.mails.find(x => x.id === el.dataset.id); m && replyTo(m, false); },
+  replyall(el) { const m = state.mails.find(x => x.id === el.dataset.id); m && replyTo(m, true); },
+  forward(el) { const m = state.mails.find(x => x.id === el.dataset.id); m && forwardMail(m); },
+  async newlabel() {
+    const name = await askText('New label', { placeholder: 'Label name', ok: 'Create' }); if (!name) return;
+    const labels = state.profile.labels || [];
+    if (labels.length >= 50) return toast('Label limit reached.', { error: true });
+    if (labels.some(l => l.name.toLowerCase() === name.toLowerCase())) return toast('That label already exists.', { error: true });
+    await saveLabels([...labels, { id: 'l' + Date.now().toString(36), name: name.slice(0, 40), color: PALETTE[labels.length % PALETTE.length] }]).catch(e => toast(e.message, { error: true }));
+  },
+  async dellabel(el, e) {
+    e.stopPropagation(); const id = el.dataset.id, l = (state.profile.labels || []).find(x => x.id === id); if (!l) return;
+    if (!await confirmBox('Delete label?', `"${l.name}" will be removed. Messages are not deleted.`, 'Delete')) return;
+    if (state.view === 'label:' + id) state.view = 'inbox';
+    await saveLabels((state.profile.labels || []).filter(x => x.id !== id)).catch(err => toast(err.message, { error: true }));
+  },
+  settings() { openSettings(); },
+  async theme() { const t = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = t; renderChrome(); updateDoc(doc(db, 'users', me()), { theme: t }).catch(() => { }); },
+  clearsearch() { $('#search').value = ''; state.query = ''; $('#clearSearch').hidden = true; renderAll(); },
+  usermenu(el) {
+    popover(el, [{ head: state.profile.displayName + ' · ' + state.profile.address }, { label: 'Settings', icon: 'sliders', fn: openSettings }, { sep: true }, { label: 'Sign out', icon: 'logout', fn: () => signOut(auth) }]);
   }
-  return pages;
-}
-function makeThumbnail(){
-  const pg = state.pages[0];
-  if (!pg) return '';
-  const flat = flattenPage(pg);
-  const maxW = 320;
-  const scale = Math.min(1, maxW/flat.width);
-  const c = document.createElement('canvas');
-  c.width = Math.max(1, Math.round(flat.width*scale));
-  c.height = Math.max(1, Math.round(flat.height*scale));
-  c.getContext('2d').drawImage(flat, 0, 0, c.width, c.height);
-  return c.toDataURL('image/jpeg', 0.72);
-}
-
-/* ---- save / autosave ---- */
-let saveDebounceTimer = null;
-function setSaveStatus(kind){
-  const el = $('#save-status');
-  if (!el) return;
-  el.classList.remove('saved','saving','pending','error');
-  if (!state.pages.length){ el.textContent=''; return; }
-  const labels = {saving:'Saving…', saved:'Saved to this browser', pending:'Unsaved changes', error:'Save failed'};
-  el.textContent = labels[kind] || '';
-  if (kind) el.classList.add(kind);
-}
-async function saveCurrentProject(){
-  if (!state.pages.length || !state.projectId) return;
-  setSaveStatus('saving');
-  const record = {
-    id: state.projectId,
-    name: state.projectName || state.fileName || 'Untitled document',
-    fileType: state.fileType,
-    createdAt: state._createdAt || Date.now(),
-    updatedAt: Date.now(),
-    thumbnail: makeThumbnail(),
-    currentPage: state.currentPage,
-    zoom: state.zoom,
-    pages: serializePages(),
-  };
-  state._createdAt = record.createdAt;
-  if (state.fileType === 'pptx'){
-    record.pptxMeta = {
-      blob: state.originalPptxBlob,
-      slideOrder: state.pptxSlideOrder,
-      presentationXml: state.pptxPresentationXml,
-      slideSize: state.pptxSlideSize,
-    };
-  }
-  try {
-    await idbPut(record);
-    setSaveStatus('saved');
-  } catch(err){
-    console.error(err);
-    setSaveStatus('error');
-  }
-}
-function scheduleSave(){
-  setSaveStatus('pending');
-  clearTimeout(saveDebounceTimer);
-  saveDebounceTimer = setTimeout(()=>{ saveCurrentProject(); }, 1000);
-}
-
-/* ---- load a saved project back into the editor ---- */
-async function loadProjectFromRecord(record){
-  resetState();
-  state.fileType = record.fileType;
-  state.fileName = record.name;
-  state.projectId = record.id;
-  state.projectName = record.name;
-  state._createdAt = record.createdAt;
-  $('#filename').textContent = record.name;
-
-  if (record.fileType === 'pptx' && record.pptxMeta){
-    state.originalPptxBlob = record.pptxMeta.blob;
-    state.pptxZip = await JSZip.loadAsync(record.pptxMeta.blob);
-    state.pptxSlideOrder = record.pptxMeta.slideOrder;
-    state.pptxPresentationXml = record.pptxMeta.presentationXml;
-    state.pptxSlideSize = record.pptxMeta.slideSize;
-  }
-
-  state.pages = await deserializePages(record.pages);
-  state.currentPage = Math.min(record.currentPage||0, Math.max(0, state.pages.length-1));
-  state.zoom = record.zoom || 1;
-
-  $('#format-badge').textContent = state.fileType;
-  $('#btn-export').disabled = false;
-  emptyState.style.display = 'none';
-  canvasHolder.style.display = 'block';
-  pushHistorySnapshotInit();
-  renderCurrentPage();
-  buildPagesTab();
-  buildTextTab();
-  updateStatus();
-  updateOptionsBar();
-  setSaveStatus('saved');
-  switchView('editor');
-}
-async function openProject(id){
-  const rec = await idbGet(id);
-  if (!rec){ toast('Document not found'); renderDashboard(); return; }
-  try {
-    await loadProjectFromRecord(rec);
-  } catch(err){
-    console.error(err);
-    toast('Could not open document: ' + err.message);
-  }
-}
-
-/* ---- dashboard rendering ---- */
-function formatRelativeTime(ts){
-  const diff = Date.now() - ts;
-  const m = Math.floor(diff/60000);
-  if (m < 1) return 'Just now';
-  if (m < 60) return m + ' min ago';
-  const h = Math.floor(m/60);
-  if (h < 24) return h + ' hr ago';
-  const d = Math.floor(h/24);
-  if (d < 7) return d + ' day' + (d>1?'s':'') + ' ago';
-  return new Date(ts).toLocaleDateString();
-}
-function formatBytes(n){
-  if (!n) return '0 B';
-  if (n < 1024) return n + ' B';
-  if (n < 1024*1024) return (n/1024).toFixed(1) + ' KB';
-  return (n/1024/1024).toFixed(1) + ' MB';
-}
-async function updateStorageNote(count){
-  const note = $('#dash-storage-note');
-  if (!note) return;
-  let usageText = '';
-  if (navigator.storage && navigator.storage.estimate){
-    try {
-      const est = await navigator.storage.estimate();
-      usageText = ' · ' + formatBytes(est.usage||0) + ' used on this device';
-    } catch(e){ /* ignore */ }
-  }
-  note.textContent = `${count} document${count!==1?'s':''}${usageText}`;
-}
-async function renderDashboard(filter){
-  filter = filter || '';
-  const grid = $('#dash-grid');
-  const empty = $('#dash-empty');
-  let records = [];
-  try { records = await idbGetAll(); } catch(err){ console.error(err); }
-  records.sort((a,b)=> b.updatedAt - a.updatedAt);
-  const filtered = filter ? records.filter(r => (r.name||'').toLowerCase().includes(filter.toLowerCase())) : records;
-
-  if (!filtered.length){
-    grid.innerHTML = '';
-    empty.style.display = 'flex';
-    updateStorageNote(records.length);
-    return;
-  }
-  empty.style.display = 'none';
-  grid.innerHTML = filtered.map(r => `
-    <div class="dash-card" data-id="${r.id}">
-      <div class="dash-thumb">${r.thumbnail ? `<img src="${r.thumbnail}" alt="">` : `<span class="dash-thumb-empty">No preview</span>`}<span class="dash-type">${r.fileType}</span></div>
-      <div class="dash-meta">
-        <div class="dash-title">${escapeHtml(r.name)}</div>
-        <div class="dash-sub">${formatRelativeTime(r.updatedAt)}</div>
-      </div>
-      <div class="dash-card-actions">
-        <button class="icon-btn" data-act="rename" title="Rename">${svgIcon('pencil')}</button>
-        <button class="icon-btn" data-act="dup" title="Duplicate">${svgIcon('dup')}</button>
-        <button class="icon-btn" data-act="del" title="Delete">${svgIcon('trash')}</button>
-      </div>
-    </div>`).join('');
-
-  grid.querySelectorAll('.dash-card').forEach(card=>{
-    card.addEventListener('click', e=>{
-      if (e.target.closest('.dash-card-actions')) return;
-      openProject(card.dataset.id);
-    });
+};
+function bindGlobal() {
+  document.addEventListener('click', e => {
+    const el = e.target.closest('[data-act]'); if (!el || !ACT[el.dataset.act]) return;
+    if (el.dataset.act !== 'dellabel' && e.target.closest('[data-act="dellabel"]')) return;
+    ACT[el.dataset.act](el, e);
   });
-  grid.querySelectorAll('[data-act]').forEach(btn=>{
-    btn.addEventListener('click', async e=>{
-      e.stopPropagation();
-      const id = btn.closest('.dash-card').dataset.id;
-      const act = btn.dataset.act;
-      if (act === 'del'){
-        if (confirm('Delete this document? This cannot be undone.')){
-          await idbDelete(id);
-          renderDashboard($('#dash-search-input').value);
-        }
-      } else if (act === 'dup'){
-        const rec = await idbGet(id);
-        if (!rec) return;
-        const copy = {...rec, id:newProjectId(), name: rec.name + ' copy', createdAt: Date.now(), updatedAt: Date.now()};
-        await idbPut(copy);
-        renderDashboard($('#dash-search-input').value);
-        toast('Document duplicated');
-      } else if (act === 'rename'){
-        const rec = await idbGet(id);
-        if (!rec) return;
-        const name = prompt('Rename document', rec.name);
-        if (name && name.trim()){
-          rec.name = name.trim(); rec.updatedAt = Date.now();
-          await idbPut(rec);
-          renderDashboard($('#dash-search-input').value);
-        }
+  let st; $('#search').addEventListener('input', e => {
+    clearTimeout(st); st = setTimeout(() => { state.query = e.target.value; state.openKey = null; state.selected.clear(); state.cursor = -1; $('#clearSearch').hidden = !state.query; renderAll(); }, 150);
+  });
+  document.addEventListener('keydown', e => {
+    if (!state.user || e.metaKey || e.ctrlKey || e.altKey) return;
+    const t = e.target;
+    if (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable) { if (e.key === 'Escape' && t.id === 'search') t.blur(); return; }
+    if ($('#overlay').children.length) return;
+    const th = state.threads;
+    const cur = () => th[state.cursor];
+    switch (e.key) {
+      case 'c': e.preventDefault(); openCompose(); break;
+      case '/': e.preventDefault(); $('#search').focus(); break;
+      case 'j': if (!state.openKey && th.length) { state.cursor = Math.min(th.length - 1, state.cursor + 1); renderMain(); document.querySelector('.row.cur')?.scrollIntoView({ block: 'nearest' }); } break;
+      case 'k': if (!state.openKey && th.length) { state.cursor = Math.max(0, state.cursor - 1); renderMain(); document.querySelector('.row.cur')?.scrollIntoView({ block: 'nearest' }); } break;
+      case 'Enter': case 'o': if (!state.openKey && cur()) openThread(cur().key); break;
+      case 'u': case 'Escape': if (state.openKey) { state.openKey = null; renderMain(); } break;
+      case 'x': if (!state.openKey && cur()) { ACT.sel({ dataset: { id: cur().key } }); } break;
+      case 'e': if (state.openKey || state.selected.size || cur()) { if (!state.openKey && !state.selected.size) state.selected.add(cur().key); moveAction('archive'); } break;
+      case '#': if (state.openKey || state.selected.size || cur()) { if (!state.openKey && !state.selected.size) state.selected.add(cur().key); moveAction('trash'); } break;
+      case '!': if (state.openKey || state.selected.size || cur()) { if (!state.openKey && !state.selected.size) state.selected.add(cur().key); moveAction('spam'); } break;
+      case 's': { const k = state.openKey || (cur() && cur().key); if (k) toggleThreadStar(k); break; }
+      case 'r': case 'a': case 'f': {
+        if (!state.openKey) break; const ms = threadMails(state.openKey), m = ms[ms.length - 1]; if (!m) break;
+        e.preventDefault(); e.key === 'f' ? forwardMail(m) : replyTo(m, e.key === 'a'); break;
       }
-    });
+    }
   });
-  updateStorageNote(records.length);
+  window.addEventListener('beforeunload', e => { if ([...state.composes.values()].some(c => c.uploading)) { e.preventDefault(); e.returnValue = ''; } });
 }
 
-/* ---- view switching ---- */
-async function switchView(view){
-  if (view === 'dashboard' && state.pages.length && state.projectId){
-    await saveCurrentProject();
-  }
-  document.body.classList.remove('view-dashboard','view-editor');
-  document.body.classList.add('view-' + view);
-  if (view === 'dashboard'){
-    await renderDashboard($('#dash-search-input') ? $('#dash-search-input').value : '');
-  }
+/* -------------------------------- boot -------------------------------- */
+wireAuth();
+if (!CFG_OK) { $('#auth').hidden = false; }
+else {
+  onAuthStateChanged(auth, async user => {
+    if (state.signingUp) return;
+    if (user) { if (!state.user || state.user.uid !== user.uid) await boot(user); }
+    else {
+      state.unsubMails && state.unsubMails(); state.unsubProfile && state.unsubProfile();
+      state.user = null; state.profile = null; state.mails = []; state.openKey = null; state.selected.clear(); state.loaded = false;
+      state.composes.forEach(c => c.el.remove()); state.composes.clear();
+      $('#app').hidden = true; $('#auth').hidden = false; $('#aPass').value = ''; document.documentElement.dataset.theme = 'light';
+    }
+  });
 }
-$('#btn-home').onclick = () => switchView('dashboard');
-$('#dash-new-btn').onclick = () => fileInput.click();
-$('#dash-empty-new').onclick = () => fileInput.click();
-$('#dash-search-input').addEventListener('input', e => renderDashboard(e.target.value));
-
-/* ============================================================
-   INIT
-   ============================================================ */
-buildToolRail();
-buildLeftPanel();
-setTool('select');
-updateStatus();
-updateOptionsBar();
-$('#btn-home').innerHTML = svgIcon('home');
-switchView('dashboard');
 </script>
-<!-- ===== PRO EDITOR UPGRADE — paste this whole block just before </body> ===== -->
-<style>
-#stage-wrap{display:grid;padding:28px}
-#canvas-holder,#empty-state{margin:auto}
-@media (any-pointer:fine){.tool-btn{height:30px}}
-#statusbar .pe-btn{background:none;border:1px solid var(--border);color:var(--text-dim);border-radius:3px;font:inherit;padding:1px 8px;cursor:pointer}
-#statusbar .pe-btn:hover{color:var(--accent-strong);border-color:var(--accent)}
-#sig-overlay{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;z-index:1000}
-#sig-overlay.show{display:flex}
-#sig-box{background:#232326;border:1px solid var(--border);border-radius:8px;padding:18px;width:520px;max-width:94vw}
-#sig-canvas{background:#fff;border-radius:4px;width:100%;touch-action:none;cursor:crosshair;display:block}
-</style>
-<input type="file" id="pe-insert" accept=".pdf,.png,.jpg,.jpeg" style="display:none">
-<div id="sig-overlay"><div id="sig-box">
-  <h3 style="margin:0 0 12px;font-size:14px">Draw your signature</h3>
-  <canvas id="sig-canvas" width="900" height="300"></canvas>
-  <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-    <button class="btn-sm" id="sig-clear" style="flex:none">Clear</button>
-    <button class="btn-sm" id="sig-cancel" style="flex:none">Cancel</button>
-    <button class="btn-sm toggle-active" id="sig-use" style="flex:none">Use signature</button>
-  </div>
-</div></div>
-<script>
-(()=>{
-const stage=$('#stage-wrap'), STAMPS=['APPROVED','DRAFT','CONFIDENTIAL','REVIEWED','REJECTED','FINAL'];
-Object.assign(state,{fill:false,opacity:1,stamp:'APPROVED',sig:null});
-const clone=o=>({...o,points:o.points&&o.points.map(p=>({...p}))});
-let tmr; const later=f=>{clearTimeout(tmr);tmr=setTimeout(f,400);};
-
-/* ---------- new tools ---------- */
-Object.assign(ICONS,{
- hand:'<path d="M8 13V5a1.5 1.5 0 013 0v6m0-5a1.5 1.5 0 013 0v5m0-3a1.5 1.5 0 013 0v7a6 6 0 01-6 6h-1a6 6 0 01-5-3l-3-5a1.5 1.5 0 012.5-1.5L8 15"/>',
- whiteout:'<rect x="3" y="6" width="18" height="12" rx="1" fill="currentColor" fill-opacity=".2"/>',
- redact:'<rect x="3" y="6" width="18" height="12" rx="1" fill="currentColor"/>',
- stamp:'<path d="M5 21h14M8 17h8l-1-5a3 3 0 10-6 0z"/>',
- sign:'<path d="M3 16c3-6 5-9 6-8s-3 8-1 8 4-6 6-6 0 5 2 5 3-2 5-3"/><path d="M3 21h18"/>'});
-TOOLS.splice(1,0,{id:'hand',icon:'hand',label:'Hand / pan (M)'});
-TOOLS.splice(TOOLS.findIndex(t=>t.id==='note'),0,
- {id:'whiteout',icon:'whiteout',label:'Whiteout (W)'},{id:'redact',icon:'redact',label:'Redact (X)'},
- {id:'stamp',icon:'stamp',label:'Stamp (S)'},{id:'sign',icon:'sign',label:'Signature (G)'});
-Object.assign(TOOL_META,{hand:{label:'Hand',key:'M'},whiteout:{label:'Whiteout',key:'W'},redact:{label:'Redact',key:'X'},stamp:{label:'Stamp',key:'S'},sign:{label:'Sign',key:'G'}});
-buildToolRail();
-
-/* ---------- rendering of new object types ---------- */
-const _draw=drawObject;
-drawObject=function(ctx,o,sel){
- const T=o.type;
- if(T==='whiteout'||T==='redact'||((T==='rect'||T==='ellipse')&&o.fill)){
-  ctx.save();ctx.globalAlpha=(T==='rect'||T==='ellipse')?(o.opacity??1):1;
-  ctx.fillStyle=T==='whiteout'?'#fff':T==='redact'?'#000':o.color;
-  ctx.beginPath();
-  if(T==='ellipse')ctx.ellipse(o.x+o.w/2,o.y+o.h/2,Math.abs(o.w/2),Math.abs(o.h/2),0,0,7);else ctx.rect(o.x,o.y,o.w,o.h);
-  ctx.fill();ctx.restore();if(sel)drawSelectionBox(ctx,o);
- } else if(T==='stamp'){
-  ctx.save();ctx.globalAlpha=o.opacity??.9;ctx.strokeStyle=ctx.fillStyle=o.color;ctx.lineWidth=Math.max(2,o.h*.08);
-  ctx.strokeRect(o.x,o.y,o.w,o.h);ctx.font=`800 ${o.h*.5}px Syne,sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillText(o.text,o.x+o.w/2,o.y+o.h/2,o.w*.9);ctx.restore();if(sel)drawSelectionBox(ctx,o);
- } else if((T==='rect'||T==='ellipse'||T==='image')&&o.opacity!=null){
-  ctx.save();ctx.globalAlpha=o.opacity;_draw(ctx,o,sel);ctx.restore();
- } else _draw(ctx,o,sel);
-};
-
-/* ---------- zoom: real layout zoom, fit width/page, Ctrl+wheel ---------- */
-applyZoomStyle=function(){
- const pg=state.pages[state.currentPage];if(!pg)return;
- const w=pg.width*state.zoom+'px',h=pg.height*state.zoom+'px';
- canvasHolder.style.transform='none';canvasHolder.style.width=w;canvasHolder.style.height=h;
- [baseCanvas,overlayCanvas].forEach(c=>{c.style.width=w;c.style.height=h;});
-};
-function fit(m){const pg=state.pages[state.currentPage];if(!pg)return;
- const W=stage.clientWidth-60,H=stage.clientHeight-60;
- state.zoom=Math.max(.1,Math.min(3,m==='w'?W/pg.width:Math.min(W/pg.width,H/pg.height)));applyZoomStyle();updateStatus();}
-const zc=$('.zoom-controls');
-zc.insertAdjacentHTML('beforebegin','<button class="pe-btn" id="pe-fw">Fit width</button><button class="pe-btn" id="pe-fp">Fit page</button>');
-$('#pe-fw').onclick=()=>fit('w');$('#pe-fp').onclick=()=>fit('p');
-stage.addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();
- state.zoom=Math.min(4,Math.max(.1,state.zoom*(e.deltaY<0?1.1:.9)));applyZoomStyle();updateStatus();},{passive:false});
-for(const n of ['loadFile','openProject','startBlankDocument']){
- const f=window[n];window[n]=async function(...a){const r=await f.apply(this,a);if(state.pages.length)requestAnimationFrame(()=>fit('p'));return r;};}
-
-/* ---------- pointer handling (capture phase, takes over new tools) ---------- */
-let ext=null,pendingPt=null;
-const BOX=['rect','ellipse','whiteout','redact'];
-function handleAt(pt){const o=getSelectedObject();if(!o||o.type==='note')return null;
- const b=getBBox(o),r=10/state.zoom,c=[[b.x-4,b.y-4],[b.x+b.w+4,b.y-4],[b.x-4,b.y+b.h+4],[b.x+b.w+4,b.y+b.h+4]];
- const i=c.findIndex(q=>Math.abs(q[0]-pt.x)<r&&Math.abs(q[1]-pt.y)<r);
- return i<0?null:{o,b,i,g:clone(o)};}
-function place(o){const pg=state.pages[state.currentPage];o.id=newId();pg.objects.push(o);state.selectedObjectId=o.id;
- commitHistory();setTool('select');buildNotesTab();}
-function placeSig(pt){const s=state.sig,w=220;place({type:'image',x:pt.x-w/2,y:pt.y-w*s.r/2,w,h:w*s.r,img:s.img,color:'#000'});}
-overlayCanvas.addEventListener('pointerdown',e=>{
- if(!state.pages.length||ext)return;
- const t=state.tool,pt=canvasPoint(e);let h;
- if(t==='hand')ext={m:'pan',x:e.clientX,y:e.clientY,l:stage.scrollLeft,t:stage.scrollTop};
- else if(t==='select'&&(h=handleAt(pt)))ext={m:'size',...h};
- else if(BOX.includes(t))ext={m:'box',t,s:pt};
- else if(t==='stamp'){e.stopImmediatePropagation();const H=56;
-  place({type:'stamp',text:state.stamp,x:pt.x-80,y:pt.y-H/2,w:Math.max(150,state.stamp.length*32),h:H,color:state.color});return;}
- else if(t==='sign'){e.stopImmediatePropagation();state.sig?placeSig(pt):openSig(pt);return;}
- else return;
- e.stopImmediatePropagation();e.preventDefault();overlayCanvas.setPointerCapture(e.pointerId);
-},true);
-window.addEventListener('pointermove',e=>{
- if(!ext)return;const pt=canvasPoint(e);
- if(ext.m==='pan'){stage.scrollLeft=ext.l-(e.clientX-ext.x);stage.scrollTop=ext.t-(e.clientY-ext.y);}
- else if(ext.m==='box'){const s=ext.s;
-  dragState={mode:'ext',previewObj:{type:ext.t,x:Math.min(s.x,pt.x),y:Math.min(s.y,pt.y),w:Math.abs(pt.x-s.x),h:Math.abs(pt.y-s.y),
-   color:state.color,strokeWidth:state.strokeWidth,fill:state.fill,opacity:state.opacity}};redrawOverlay();}
- else if(ext.m==='size'){const {b,i,g,o}=ext;
-  const ax=i%2?b.x:b.x+b.w,ay=i<2?b.y+b.h:b.y;
-  const nb={x:Math.min(ax,pt.x),y:Math.min(ay,pt.y),w:Math.max(Math.abs(pt.x-ax),6),h:Math.max(Math.abs(pt.y-ay),6)};
-  const sx=b.w?nb.w/b.w:1,sy=b.h?nb.h/b.h:1,X=v=>nb.x+(v-b.x)*sx,Y=v=>nb.y+(v-b.y)*sy;
-  if(g.points)o.points=g.points.map(p=>({...p,x:X(p.x),y:Y(p.y)}));
-  else{o.x=X(g.x);o.y=Y(g.y);if(g.x2!==undefined){o.x2=X(g.x2);o.y2=Y(g.y2);}
-   if(g.w!==undefined){o.w=g.w*sx;o.h=g.h*sy;}if(g.type==='text')o.fontSize=Math.max(8,g.fontSize*sy);}
-  redrawOverlay();}
-});
-window.addEventListener('pointerup',()=>{
- if(!ext)return;const x=ext;ext=null;const pv=dragState&&dragState.previewObj;dragState=null;
- if(x.m==='box'&&pv&&pv.w>2&&pv.h>2){pv.id=newId();state.pages[state.currentPage].objects.push(pv);
-  if(x.t==='rect'||x.t==='ellipse')state.selectedObjectId=null;commitHistory();buildNotesTab();}
- else if(x.m==='size')commitHistory();
- redrawOverlay();
-});
-const _st=setTool;setTool=function(id){_st(id);if(id==='hand')overlayCanvas.style.cursor='grab';};
-
-/* ---------- keyboard: shortcuts, nudge, duplicate, arrange ---------- */
-window.addEventListener('keydown',e=>{
- if(isTypingTarget(e.target)||!state.pages.length)return;
- const k=e.key.toLowerCase(),o=getSelectedObject(),pg=state.pages[state.currentPage],mod=e.ctrlKey||e.metaKey;
- if(!mod){const m={m:'hand',w:'whiteout',x:'redact',s:'stamp',g:'sign'};if(m[k]){setTool(m[k]);return;}}
- if(!o||state.tool!=='select')return;
- if(k.startsWith('arrow')){e.preventDefault();const d=e.shiftKey?10:1,dx=k==='arrowleft'?-d:k==='arrowright'?d:0,dy=k==='arrowup'?-d:k==='arrowdown'?d:0;
-  if(o.points)o.points=o.points.map(p=>({...p,x:p.x+dx,y:p.y+dy}));else{o.x+=dx;o.y+=dy;if(o.x2!==undefined){o.x2+=dx;o.y2+=dy;}}
-  redrawOverlay();later(commitHistory);}
- else if(mod&&k==='d'){e.preventDefault();dupSel();}
- else if(k===']'||k==='['){const i=pg.objects.indexOf(o);pg.objects.splice(i,1);
-  k===']'?pg.objects.push(o):pg.objects.unshift(o);commitHistory();redrawOverlay();}
-});
-function dupSel(){const o=getSelectedObject();if(!o)return;const c=clone(o);c.id=newId();
- if(c.points)c.points=c.points.map(p=>({...p,x:p.x+16,y:p.y+16}));else{c.x+=16;c.y+=16;if(c.x2!==undefined){c.x2+=16;c.y2+=16;}}
- state.pages[state.currentPage].objects.push(c);state.selectedObjectId=c.id;commitHistory();buildLeftPanel();redrawOverlay();}
-
-/* ---------- properties panel additions ---------- */
-const opField=v=>`<div class="field"><label>Opacity</label><div class="range-row"><input type="range" id="pe-op" min="5" max="100" value="${Math.round(v*100)}"><span class="range-val">${Math.round(v*100)}%</span></div></div>`;
-const _blp=buildLeftPanel;
-buildLeftPanel=function(){
- _blp();const t=state.tool,o=getSelectedObject();let h='';
- const hint=s=>`<p class="hint">${s}</p>`;
- if(t==='rect'||t==='ellipse')h+=`<div class="field"><label>Fill</label><div class="toggle-row"><button class="btn-sm ${state.fill?'toggle-active':''}" id="pe-fill">Filled shape</button></div></div>`+opField(state.opacity);
- if(t==='stamp')h+=`<div class="field"><label>Stamp</label><select id="pe-stamp">${STAMPS.map(s=>`<option ${s===state.stamp?'selected':''}>${s}</option>`).join('')}</select></div>`+hint('Click the page to place it. Drag a corner handle to resize.');
- if(t==='sign')h+=`<div class="field"><button class="btn-sm" id="pe-newsig">${state.sig?'Redraw signature…':'Draw signature…'}</button></div>`+hint('Click the page to place your signature.');
- if(t==='whiteout')h+=hint('Drag to cover content with white, then add new text on top to edit it.');
- if(t==='redact')h+=hint('Drag over sensitive content. Export flattens each page, so the covered pixels are permanently removed.');
- if(t==='hand')h+=hint('Drag to pan. Ctrl + wheel zooms.');
- if(t==='select'&&o){
-  if(o.type==='rect'||o.type==='ellipse')h+=`<div class="field"><button class="btn-sm ${o.fill?'toggle-active':''}" id="pe-ofill">Filled</button></div>`;
-  if(['rect','ellipse','image','stamp'].includes(o.type))h+=opField(o.opacity??(o.type==='stamp'?.9:1));
-  h+=`<div class="btn-row" style="margin-bottom:8px"><button class="btn-sm" id="pe-dup">Duplicate</button><button class="btn-sm" id="pe-front">Front</button><button class="btn-sm" id="pe-back">Back</button></div>`+hint('Drag corner handles to resize. Arrow keys nudge (Shift = 10px).');
- }
- if(!h)return;$('#left-panel').insertAdjacentHTML('beforeend',h);
- const g=id=>document.getElementById(id);
- if(g('pe-fill'))g('pe-fill').onclick=()=>{state.fill=!state.fill;buildLeftPanel();};
- if(g('pe-ofill'))g('pe-ofill').onclick=()=>{o.fill=!o.fill;commitHistory();buildLeftPanel();redrawOverlay();};
- if(g('pe-op'))g('pe-op').oninput=ev=>{const v=ev.target.value/100;ev.target.nextElementSibling.textContent=ev.target.value+'%';
-  if(t==='select'&&o){o.opacity=v;redrawOverlay();later(commitHistory);}else state.opacity=v;};
- if(g('pe-stamp'))g('pe-stamp').onchange=ev=>{state.stamp=ev.target.value;};
- if(g('pe-newsig'))g('pe-newsig').onclick=()=>openSig(null);
- if(g('pe-dup'))g('pe-dup').onclick=dupSel;
- const ord=f=>()=>{const pg=state.pages[state.currentPage],i=pg.objects.indexOf(o);pg.objects.splice(i,1);f(pg.objects,o);commitHistory();redrawOverlay();};
- if(g('pe-front'))g('pe-front').onclick=ord((a,x)=>a.push(x));
- if(g('pe-back'))g('pe-back').onclick=ord((a,x)=>a.unshift(x));
-};
-buildLeftPanel();
-
-/* ---------- signature pad ---------- */
-const sc=$('#sig-canvas'),sx=sc.getContext('2d');let ink=null,drawing=false;
-const resetSig=()=>{sx.clearRect(0,0,sc.width,sc.height);ink=null;};
-function openSig(pt){pendingPt=pt;resetSig();$('#sig-overlay').classList.add('show');}
-const sp=e=>{const r=sc.getBoundingClientRect();return{x:(e.clientX-r.left)*sc.width/r.width,y:(e.clientY-r.top)*sc.height/r.height};};
-sc.addEventListener('pointerdown',e=>{drawing=true;sc.setPointerCapture(e.pointerId);const p=sp(e);
- sx.strokeStyle='#14246b';sx.lineWidth=6;sx.lineCap=sx.lineJoin='round';sx.beginPath();sx.moveTo(p.x,p.y);
- ink=ink||{a:p.x,b:p.y,c:p.x,d:p.y};});
-sc.addEventListener('pointermove',e=>{if(!drawing)return;const p=sp(e);sx.lineTo(p.x,p.y);sx.stroke();
- ink.a=Math.min(ink.a,p.x);ink.b=Math.min(ink.b,p.y);ink.c=Math.max(ink.c,p.x);ink.d=Math.max(ink.d,p.y);});
-sc.addEventListener('pointerup',()=>{drawing=false;});
-$('#sig-clear').onclick=resetSig;
-$('#sig-cancel').onclick=()=>$('#sig-overlay').classList.remove('show');
-$('#sig-use').onclick=()=>{if(!ink)return;const pad=10,w=ink.c-ink.a+pad*2,h=ink.d-ink.b+pad*2,c=document.createElement('canvas');
- c.width=w;c.height=h;c.getContext('2d').drawImage(sc,ink.a-pad,ink.b-pad,w,h,0,0,w,h);
- const img=new Image();img.onload=()=>{state.sig={img,r:h/w};$('#sig-overlay').classList.remove('show');
-  if(state.tool==='sign'&&pendingPt)placeSig(pendingPt);else buildLeftPanel();};img.src=c.toDataURL();};
-
-/* ---------- history fixes: keep images in undo, don't alias snapshots ---------- */
-const cl=o=>o.type==='image'?{...o}:JSON.parse(JSON.stringify(o));
-snapshotDoc=()=>state.pages.map(pg=>({objects:pg.objects.map(cl),dataUrl:pg.baseCanvas.toDataURL(),width:pg.width,height:pg.height,
- textRuns:pg.textRuns?JSON.parse(JSON.stringify(pg.textRuns)):undefined}));
-const _rs=restoreSnapshot;restoreSnapshot=s=>_rs(s.map(p=>({...p,objects:p.objects.map(cl)})));
-
-/* ---------- document tools (Object menu) ---------- */
-const dd=document.querySelector('[data-menu="object"] .menu-dropdown');
-dd.insertAdjacentHTML('beforeend','<div class="menu-divider"></div><button class="menu-opt" id="pe-m-ins">Insert pages from file…</button><button class="menu-opt" id="pe-m-wm">Add watermark…</button><button class="menu-opt" id="pe-m-num">Add page numbers</button><button class="menu-opt" id="pe-m-png">Export this page as PNG</button>');
-const needDoc=()=>{if(!state.pages.length)return false;if(state.fileType==='pptx'){toast('Not available for PPTX');return false;}return true;};
-$('#pe-m-ins').onclick=()=>{if(needDoc())$('#pe-insert').click();};
-$('#pe-insert').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const add=[];
- try{
-  if(/\.pdf$/i.test(f.name)){const pdf=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise;
-   for(let i=1;i<=pdf.numPages;i++){const p=await pdf.getPage(i),v=p.getViewport({scale:1.5}),c=document.createElement('canvas');
-    c.width=v.width;c.height=v.height;await p.render({canvasContext:c.getContext('2d'),viewport:v}).promise;add.push(c);}}
-  else{const img=await new Promise((r,j)=>{const m=new Image();m.onload=()=>r(m);m.onerror=j;m.src=URL.createObjectURL(f);});
-   const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);add.push(c);}
- }catch(err){toast('Could not insert: '+err.message);return;}
- state.pages.splice(state.currentPage+1,0,...add.map(c=>({baseCanvas:c,objects:[],width:c.width,height:c.height})));
- state.currentPage++;commitHistory();renderCurrentPage();buildPagesTab();buildTextTab();buildNotesTab();updateStatus();toast(add.length+' page(s) inserted');};
-$('#pe-m-wm').onclick=()=>{if(!needDoc())return;const t=prompt('Watermark text','CONFIDENTIAL');if(!t)return;
- state.pages.forEach(pg=>{const c=pg.baseCanvas.getContext('2d'),w=pg.width,h=pg.height;c.save();c.globalAlpha=.12;c.fillStyle='#777';
-  c.translate(w/2,h/2);c.rotate(-Math.atan2(h,w));c.font=`800 ${Math.min(w,h)*.13}px Syne,sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(t,0,0,Math.hypot(w,h)*.8);c.restore();});
- commitHistory();renderCurrentPage();toast('Watermark added');};
-$('#pe-m-num').onclick=()=>{if(!needDoc())return;
- state.pages.forEach((pg,i)=>{const c=pg.baseCanvas.getContext('2d');c.save();c.fillStyle='#555';c.font=`${Math.max(12,pg.width*.016)}px 'DM Sans',sans-serif`;
-  c.textAlign='center';c.fillText(`${i+1} / ${state.pages.length}`,pg.width/2,pg.height-pg.height*.025);c.restore();});
- commitHistory();renderCurrentPage();toast('Page numbers added');};
-$('#pe-m-png').onclick=()=>{if(!state.pages.length)return;flattenPage(state.pages[state.currentPage]).toBlob(b=>downloadBlob(b,`${baseName()}-page-${state.currentPage+1}.png`));};
-})();
-</script>
-<!-- ===== END UPGRADE ===== -->
 </body>
 </html>
